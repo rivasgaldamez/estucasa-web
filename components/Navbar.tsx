@@ -61,7 +61,9 @@ export default function Navbar({ variant = "light" }: NavbarProps) {
           />
 
           <div className="hidden sm:block">
-            <div className="display text-2xl leading-none">ES Tu Casa</div>
+            <div className="display text-2xl leading-none">
+              ES Tu Casa
+            </div>
           </div>
 
           <span
@@ -83,23 +85,45 @@ export default function Navbar({ variant = "light" }: NavbarProps) {
             <span>Inicio</span>
           </Link>
 
-          <Link href="/propiedades" className="hover:opacity-70 transition">
+          <Link
+            href="/propiedades"
+            className="hover:opacity-70 transition"
+          >
             <span>Propiedades</span>
           </Link>
 
-          <Link href="/hermano-lejano" className="hover:opacity-70 transition">
+          <Link
+            href="/hermano-lejano"
+            className="hover:opacity-70 transition"
+          >
             <span>Hermano Lejano</span>
           </Link>
 
-          <Link href="/vender" className="hover:opacity-70 transition">
+          <Link
+            href="/vender"
+            className="hover:opacity-70 transition"
+          >
             <span>Vender</span>
           </Link>
 
-          <Link href="/blog" className="hover:opacity-70 transition">
+          <Link
+            href="/blog"
+            className="hover:opacity-70 transition"
+          >
             <span>Blog</span>
           </Link>
 
-          <Link href="/asesores" className="hover:opacity-70 transition">
+          <Link
+            href="/preguntas-frecuentes"
+            className="hover:opacity-70 transition"
+          >
+            <span>Preguntas</span>
+          </Link>
+
+          <Link
+            href="/asesores"
+            className="hover:opacity-70 transition"
+          >
             <span>Asesores</span>
           </Link>
         </div>
@@ -111,6 +135,7 @@ export default function Navbar({ variant = "light" }: NavbarProps) {
           className="bg-brand-blue text-cream px-6 py-3.5 rounded-full text-sm font-medium inline-flex items-center gap-2 border border-brand-blue hover:bg-brand-blue-deep transition-colors"
         >
           <span>WhatsApp</span>
+
           <ArrowUpRight size={14} />
         </a>
       </div>
