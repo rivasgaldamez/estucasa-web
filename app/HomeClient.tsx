@@ -2,10 +2,10 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import Waves from "@/components/Waves";
 import Sun from "@/components/Sun";
+import Torogoz from "@/components/Torogoz";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Siguenos from "@/components/Siguenos";
@@ -101,15 +101,10 @@ export default function HomeClient({ destacadas }: Props) {
           </div>
         </div>
 
-        <div className="hidden md:block absolute top-[180px] right-[8%] z-[1] animate-float">
-          <Image
-            src="/logo.png"
-            alt="ES Tu Casa"
-            width={220}
-            height={220}
-            className="object-contain drop-shadow-2xl"
-            priority
-          />
+        <div className="hidden md:block absolute top-[300px] right-[10%] z-[1] animate-float">
+          <div className="text-brand-blue drop-shadow-2xl">
+            <Torogoz size={180} />
+          </div>
         </div>
 
         <div className="max-w-[1440px] mx-auto relative z-10">
@@ -124,22 +119,49 @@ export default function HomeClient({ destacadas }: Props) {
             </div>
           </div>
 
-          <div className="mb-16 max-w-[1100px]">
-            <h1 className="display text-6xl sm:text-7xl md:text-8xl lg:text-[10rem] mb-6">
-              <span className="block animate-fade-up">El Salvador</span>
-              <span className="block animate-fade-up text-brand-blue">
-                <span className="bg-brand-blue text-cream px-4 rounded-xl mr-3 inline-block">
-                  ES
+          <div className="grid lg:grid-cols-[1.4fr_1fr] gap-12 lg:gap-16 mb-16 items-start">
+            <div className="max-w-[1100px]">
+              <h1 className="display text-6xl sm:text-7xl md:text-8xl lg:text-[9rem] mb-6">
+                <span className="block animate-fade-up">El Salvador</span>
+                <span className="block animate-fade-up text-brand-blue">
+                  <span className="bg-brand-blue text-cream px-4 rounded-xl mr-3 inline-block">
+                    ES
+                  </span>
+                  <span className="italic-display">Tu Casa.</span>
                 </span>
-                <span className="italic-display">Tu Casa.</span>
-              </span>
-            </h1>
+              </h1>
 
-            <p className="text-[15px] text-ink-soft tracking-wide mt-3 max-w-[640px] animate-fade-up">
-              <strong className="text-brand-blue font-semibold">ES</strong> es
-              El Salvador. <strong>Tu Casa</strong> es lo que hacemos. Nuestro
-              nombre es tambien nuestra promesa.
-            </p>
+              <p className="text-[15px] text-ink-soft tracking-wide mt-3 max-w-[640px] animate-fade-up">
+                <strong className="text-brand-blue font-semibold">ES</strong>{" "}
+                es El Salvador. <strong>Tu Casa</strong> es lo que hacemos.
+                Nuestro nombre es tambien nuestra promesa.
+              </p>
+            </div>
+
+            <div className="reveal hidden lg:flex flex-col justify-center pt-12 pr-[180px] xl:pr-[200px]">
+              <div className="relative">
+                <div className="absolute -top-8 -left-2 display text-8xl text-sun opacity-60 leading-none select-none">
+                  &ldquo;
+                </div>
+
+                <blockquote className="display text-3xl xl:text-4xl leading-tight text-ink relative pl-4">
+                  <span className="block">Tu casa</span>
+                  <span className="block">es el comienzo</span>
+                  <span className="italic-display text-brand-blue">
+                    de tu historia.
+                  </span>
+                </blockquote>
+
+                <div className="mt-6 pl-4 border-l-2 border-sun">
+                  <div className="eyebrow text-ink-soft mb-1">
+                    Nuestra promesa
+                  </div>
+                  <div className="text-sm font-medium text-ink">
+                    ES Tu Casa Inmobiliaria
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-16 items-end mb-14">
