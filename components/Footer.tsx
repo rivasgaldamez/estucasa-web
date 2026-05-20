@@ -44,6 +44,10 @@ export default function Footer() {
             <div className="eyebrow opacity-50 mb-4">Navegacion</div>
 
             <div className="flex flex-col gap-2.5 text-sm">
+              <Link href="/" className="hover:text-sun transition">
+                <span>Inicio</span>
+              </Link>
+
               <Link href="/propiedades" className="hover:text-sun transition">
                 <span>Propiedades</span>
               </Link>
@@ -60,6 +64,13 @@ export default function Footer() {
                 <span>Blog</span>
               </Link>
 
+              <Link
+                href="/preguntas-frecuentes"
+                className="hover:text-sun transition"
+              >
+                <span>Preguntas Frecuentes</span>
+              </Link>
+
               <Link href="/asesores" className="hover:text-sun transition">
                 <span>Asesores</span>
               </Link>
@@ -70,11 +81,21 @@ export default function Footer() {
             <div className="eyebrow opacity-50 mb-4">Contacto</div>
 
             <div className="flex flex-col gap-2.5 text-sm">
-              <a href="tel:+50379889533" className="hover:text-sun transition">
+              <a
+                href="https://wa.me/50379889533"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-sun transition"
+              >
                 <span>Mario - 7988-9533</span>
               </a>
 
-              <a href="tel:+50377303494" className="hover:text-sun transition">
+              <a
+                href="https://wa.me/50377303494"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-sun transition"
+              >
                 <span>Carlos - 7730-3494</span>
               </a>
 
@@ -93,15 +114,39 @@ export default function Footer() {
             <div className="eyebrow opacity-50 mb-4">Siguenos</div>
 
             <div className="flex flex-col gap-2.5 text-sm">
-              <a href="#" className="hover:text-sun transition">
+              <a
+                href="https://www.instagram.com/estucasa_elsalvador/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-sun transition"
+              >
                 <span>Instagram</span>
               </a>
 
-              <a href="#" className="hover:text-sun transition">
+              <a
+                href="https://www.facebook.com/Estucasasv"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-sun transition"
+              >
                 <span>Facebook</span>
               </a>
 
-              <a href="#" className="hover:text-sun transition">
+              <a
+                href="https://www.tiktok.com/@estucasasvelsalvador"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-sun transition"
+              >
+                <span>TikTok</span>
+              </a>
+
+              <a
+                href="https://www.youtube.com/@EStucasaInmobiliariaElsalvador"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-sun transition"
+              >
                 <span>YouTube</span>
               </a>
 
