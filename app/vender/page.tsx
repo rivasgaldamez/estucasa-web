@@ -816,7 +816,7 @@ export default function VenderPage() {
                   </a>
 
                   <a
-                    href="https://wa.me/50377303494"
+                    href="https://wa.me/50377303994"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="bg-brand-blue text-cream px-6 py-3 rounded-full text-sm font-medium inline-flex items-center gap-2 hover:bg-brand-blue-deep"
