@@ -459,12 +459,12 @@ export default function HomeClient({ destacadas }: Props) {
             </a>
 
             <a
-              href="https://wa.me/50377303494"
+              href="https://wa.me/50377303994"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-sun text-brand-blue-deep px-7 py-4 rounded-full text-sm font-semibold inline-flex items-center gap-2 hover:bg-sun-soft transition-colors"
             >
-              <span>WhatsApp Carlos - 7730-3494</span>
+              <span>WhatsApp Carlos - 7730-3994</span>
               <ArrowUpRight size={14} />
             </a>
           </div>
