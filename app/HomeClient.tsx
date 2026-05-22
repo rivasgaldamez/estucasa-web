@@ -167,7 +167,7 @@ export default function HomeClient({ destacadas }: Props) {
           <div className="grid md:grid-cols-2 gap-16 items-end mb-14">
             <p className="reveal text-lg leading-relaxed text-ink-soft max-w-[520px] font-light">
               Propiedades destacadas desde San Salvador hasta la costa.
-              Video-drone profesional, acompanamiento completo y red de
+              Video-drone profesional, acompañamiento completo y red de
               compradores - aqui, o a ocho mil kilometros de distancia.
             </p>
 
