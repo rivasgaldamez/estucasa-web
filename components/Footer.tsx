@@ -91,12 +91,12 @@ export default function Footer() {
               </a>
 
               <a
-                href="https://wa.me/50377303494"
+                href="https://wa.me/50377303994"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-sun transition"
               >
-                <span>Carlos - 7730-3494</span>
+                <span>Carlos - 7730-3994</span>
               </a>
 
               <a
