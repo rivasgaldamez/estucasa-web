@@ -187,7 +187,6 @@ export default function HermanoLejanoPage() {
             </a>
           </div>
 
-          {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-16 mt-20 pt-8 border-t border-white/15">
             <div>
               <div className="display text-5xl text-sun">12</div>
@@ -426,12 +425,12 @@ export default function HermanoLejanoPage() {
             </a>
 
             <a
-              href="https://wa.me/50377303494"
+              href="https://wa.me/50377303994"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-sun text-brand-blue-deep px-7 py-4 rounded-full text-sm font-semibold inline-flex items-center gap-2 hover:bg-sun-soft transition-colors"
             >
-              <span>WhatsApp Carlos - 7730-3494</span>
+              <span>WhatsApp Carlos - 7730-3994</span>
               <ArrowUpRight size={14} />
             </a>
           </div>
