@@ -33,7 +33,6 @@ export default function VenderPage() {
     propertyType: "",
     zone: "",
     area: "",
-    rooms: "",
     timing: "",
     name: "",
     whatsapp: "",
@@ -44,9 +43,7 @@ export default function VenderPage() {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("revealed");
-          }
+          if (entry.isIntersecting) entry.target.classList.add("revealed");
         });
       },
       { threshold: 0.1 }
@@ -178,6 +175,39 @@ export default function VenderPage() {
   const nextStep = () => setWizardStep((step) => Math.min(step + 1, 4));
   const prevStep = () => setWizardStep((step) => Math.max(step - 1, 1));
 
+  const buildWhatsappMessage = () => {
+    const tipoLabels: Record<string, string> = {
+      casa: "Casa",
+      apartamento: "Apartamento",
+      terreno: "Terreno",
+      comercial: "Comercial",
+    };
+
+    const tipo = tipoLabels[formData.propertyType] || formData.propertyType;
+
+    const lineas = [
+      "Hola! Quiero vender mi propiedad con ES Tu Casa.",
+      "",
+      "*Tipo:* " + tipo,
+      "*Zona:* " + formData.zone,
+      "*Area aproximada:* " + formData.area,
+      "*Tiempo para vender:* " + (formData.timing || "No especificado"),
+      "",
+      "*Mis datos:*",
+      "Nombre: " + formData.name,
+      "WhatsApp: " + formData.whatsapp,
+      "Email: " + (formData.email || "No proporcionado"),
+    ];
+
+    return encodeURIComponent(lineas.join("\n"));
+  };
+
+  const enviarAWhatsApp = (numero: string) => {
+    const mensaje = buildWhatsappMessage();
+    const url = "https://wa.me/" + numero + "?text=" + mensaje;
+    window.open(url, "_blank");
+  };
+
   return (
     <div className="bg-cream text-ink min-h-screen">
       <Navbar variant="dark" />
@@ -236,7 +266,6 @@ export default function VenderPage() {
             </a>
           </div>
 
-          {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-16 mt-20 pt-8 border-t border-white/15">
             <div>
               <div className="display text-5xl text-sun">4K</div>
@@ -295,7 +324,9 @@ export default function VenderPage() {
                   activacion de nuestra red de diaspora salvadorena.
                 </p>
 
-                <p>Filtramos a los curiosos. Solo te llegan compradores serios.</p>
+                <p>
+                  Filtramos a los curiosos. Solo te llegan compradores serios.
+                </p>
               </div>
             </div>
 
@@ -351,7 +382,6 @@ export default function VenderPage() {
             </div>
           </div>
 
-          {/* Disclaimer avaluo */}
           <div className="mt-12 bg-cream-warm rounded-2xl p-6 border border-black/10 border-l-4 border-l-turquoise flex gap-4 items-start">
             <div className="w-10 h-10 rounded-full bg-turquoise text-cream flex items-center justify-center flex-shrink-0">
               <Shield size={18} />
@@ -460,7 +490,6 @@ export default function VenderPage() {
             })}
           </div>
 
-          {/* Commission mention */}
           <div className="mt-12 bg-cream-warm rounded-3xl p-8 border border-black/10 flex justify-between items-center flex-wrap gap-6">
             <div className="flex-1 min-w-[280px]">
               <div className="eyebrow text-sun mb-2">Sobre los honorarios</div>
@@ -514,7 +543,6 @@ export default function VenderPage() {
           </div>
 
           <div className="bg-cream rounded-3xl p-8 md:p-12 border border-black/10">
-            {/* Progress */}
             <div className="flex gap-2 mb-8">
               {[1, 2, 3, 4].map((step) => (
                 <div
@@ -536,7 +564,6 @@ export default function VenderPage() {
               </div>
             </div>
 
-            {/* STEP 1 */}
             {wizardStep === 1 ? (
               <div>
                 <h3 className="display text-3xl mb-6">
@@ -608,7 +635,6 @@ export default function VenderPage() {
               </div>
             ) : null}
 
-            {/* STEP 2 */}
             {wizardStep === 2 ? (
               <div>
                 <h3 className="display text-3xl mb-6">
@@ -625,7 +651,7 @@ export default function VenderPage() {
 
                   <input
                     type="text"
-                    placeholder="Ej: 420 m2 construccion"
+                    placeholder="Ej. 1200 varas cuadradas"
                     value={formData.area}
                     onChange={(event) =>
                       setFormData({ ...formData, area: event.target.value })
@@ -688,7 +714,6 @@ export default function VenderPage() {
               </div>
             ) : null}
 
-            {/* STEP 3 */}
             {wizardStep === 3 ? (
               <div>
                 <h3 className="display text-3xl mb-2">
@@ -779,51 +804,57 @@ export default function VenderPage() {
                         : "bg-sun/40 text-brand-blue-deep/60 px-7 py-4 rounded-full text-sm font-semibold inline-flex items-center gap-2 cursor-not-allowed"
                     }
                   >
-                    <span>Enviar mi informacion</span>
+                    <span>Revisar y enviar</span>
                     <ArrowUpRight size={14} />
                   </button>
                 </div>
               </div>
             ) : null}
 
-            {/* STEP 4 */}
             {wizardStep === 4 ? (
-              <div className="text-center py-8">
+              <div className="text-center py-4">
                 <div className="w-20 h-20 rounded-full bg-torogoz text-cream flex items-center justify-center mx-auto mb-6">
                   <CheckCircle2 size={40} />
                 </div>
 
                 <h3 className="display text-4xl mb-4">
-                  <span>Informacion </span>
-                  <span className="italic-display text-brand-blue">
-                    recibida!
-                  </span>
+                  <span>Casi </span>
+                  <span className="italic-display text-brand-blue">listo!</span>
                 </h3>
 
                 <p className="text-[17px] text-ink-soft max-w-[480px] mx-auto mb-8 font-light leading-relaxed">
-                  Mario o Carlos te contactaran por WhatsApp el mismo dia para
-                  conversar sobre tu propiedad y los siguientes pasos.
+                  Elige a quien enviar tu informacion. Se abrira WhatsApp con
+                  todos tus datos listos - solo toca enviar.
                 </p>
 
-                <div className="flex gap-3 justify-center flex-wrap">
-                  <a
-                    href="https://wa.me/50379889533"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-brand-blue text-cream px-6 py-3 rounded-full text-sm font-medium inline-flex items-center gap-2 hover:bg-brand-blue-deep"
+                <div className="flex gap-3 justify-center flex-wrap mb-6">
+                  <button
+                    type="button"
+                    onClick={() => enviarAWhatsApp("50379889533")}
+                    className="bg-brand-blue text-cream px-7 py-4 rounded-full text-sm font-semibold inline-flex items-center gap-2 hover:bg-brand-blue-deep transition-colors"
                   >
-                    <span>WhatsApp Mario</span>
-                  </a>
+                    <MessageCircle size={16} />
+                    <span>Enviar a Mario - 7988-9533</span>
+                  </button>
 
-                  <a
-                    href="https://wa.me/50377303994"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-brand-blue text-cream px-6 py-3 rounded-full text-sm font-medium inline-flex items-center gap-2 hover:bg-brand-blue-deep"
+                  <button
+                    type="button"
+                    onClick={() => enviarAWhatsApp("50377303994")}
+                    className="bg-sun text-brand-blue-deep px-7 py-4 rounded-full text-sm font-semibold inline-flex items-center gap-2 hover:bg-sun-soft transition-colors"
                   >
-                    <span>WhatsApp Carlos</span>
-                  </a>
+                    <MessageCircle size={16} />
+                    <span>Enviar a Carlos - 7730-3994</span>
+                  </button>
                 </div>
+
+                <button
+                  type="button"
+                  onClick={prevStep}
+                  className="bg-transparent border border-black/10 px-6 py-3 rounded-full text-sm font-medium inline-flex items-center gap-2 hover:bg-ink hover:text-cream transition-colors"
+                >
+                  <ArrowLeft size={14} />
+                  <span>Atras</span>
+                </button>
               </div>
             ) : null}
           </div>
