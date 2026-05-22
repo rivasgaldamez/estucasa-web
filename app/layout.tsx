@@ -6,6 +6,7 @@ import {
   jsonLdScript,
 } from "@/lib/schema";
 import ScrollToTop from "@/components/ScrollToTop";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -84,7 +85,7 @@ export default function RootLayout({
 
   return (
     <html lang="es-SV">
-      <body className="antialiased">
+      <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={jsonLdScript(organizationSchema)}
@@ -94,10 +95,12 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={jsonLdScript(websiteSchema)}
         />
+      </head>
 
+      <body className="antialiased">
         {children}
-
         <ScrollToTop />
+        <GoogleAnalytics gaId="G-MBVDNPVR62" />
       </body>
     </html>
   );
