@@ -485,7 +485,7 @@ export default function ArticuloDetalleClient({
                 </a>
 
                 <a
-                  href="https://wa.me/50377303494"
+                  href="https://wa.me/50377303994"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-7 py-4 rounded-full text-sm font-medium inline-flex items-center gap-2 border border-white/25 text-cream hover:border-sun hover:text-sun transition-colors"

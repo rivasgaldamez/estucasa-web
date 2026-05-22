@@ -291,12 +291,12 @@ export default function PreguntasFrecuentesClient({ faqs }: Props) {
                 </a>
 
                 <a
-                  href="https://wa.me/50377303494?text=Hola%20Carlos%2C%20tengo%20una%20pregunta%20sobre%20su%20servicio."
+                  href="https://wa.me/50377303994?text=Hola%20Carlos%2C%20tengo%20una%20pregunta%20sobre%20su%20servicio."
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-7 py-4 rounded-full text-sm font-medium inline-flex items-center gap-2 border border-white/25 text-cream hover:border-sun hover:text-sun transition-colors"
                 >
-                  <span>WhatsApp Carlos - 7730-3494</span>
+                  <span>WhatsApp Carlos - 7730-3994</span>
                   <ArrowUpRight size={14} />
                 </a>
               </div>
