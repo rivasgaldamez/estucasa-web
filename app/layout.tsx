@@ -5,6 +5,7 @@ import {
   getWebsiteSchema,
   jsonLdScript,
 } from "@/lib/schema";
+import ScrollToTop from "@/components/ScrollToTop";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -83,7 +84,7 @@ export default function RootLayout({
 
   return (
     <html lang="es-SV">
-      <head>
+      <body className="antialiased">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={jsonLdScript(organizationSchema)}
@@ -93,9 +94,11 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={jsonLdScript(websiteSchema)}
         />
-      </head>
 
-      <body className="antialiased">{children}</body>
+        {children}
+
+        <ScrollToTop />
+      </body>
     </html>
   );
 }
