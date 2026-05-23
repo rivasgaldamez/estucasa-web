@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { PortableText } from "@portabletext/react";
 import {
   ArrowUpRight,
   ChevronLeft,
@@ -17,6 +18,7 @@ import {
   Mail,
   MessageCircle,
 } from "lucide-react";
+
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { urlFor } from "@/lib/sanity";
@@ -25,20 +27,26 @@ type Props = {
   propiedad: any;
 };
 
-export default function PropiedadDetalleClient({ propiedad }: Props) {
+export default function PropiedadDetalleClient({
+  propiedad,
+}: Props) {
   const [activeImage, setActiveImage] = useState(0);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) entry.target.classList.add("revealed");
+          if (entry.isIntersecting) {
+            entry.target.classList.add("revealed");
+          }
         });
       },
       { threshold: 0.1 }
     );
 
-    document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+    const elements = document.querySelectorAll(".reveal");
+
+    elements.forEach((el) => observer.observe(el));
 
     return () => observer.disconnect();
   }, []);
@@ -46,41 +54,74 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
   const allImages = [
     propiedad.fotoPortada,
     ...(propiedad.galeria || []),
-  ].filter((img: any) => img && img.asset);
+  ].filter((img: any) => img?.asset);
 
-  const getImageUrl = (image: any, width = 1600, height = 900) => {
-    if (!image || !image.asset) return "";
+  const getImageUrl = (
+    image: any,
+    width = 1600,
+    height = 900
+  ) => {
+    if (!image?.asset) return "";
 
     try {
-      return urlFor(image).width(width).height(height).url();
+      return urlFor(image)
+        .width(width)
+        .height(height)
+        .url();
     } catch {
       return "";
     }
   };
 
-  const pricePerSqm = propiedad.areaConstruccion
-    ? Math.round(propiedad.precio / propiedad.areaConstruccion)
-    : null;
+  const pricePerSqm =
+    propiedad.areaConstruccion && propiedad.precio
+      ? Math.round(
+          propiedad.precio / propiedad.areaConstruccion
+        )
+      : null;
 
   const whatsappMsg = encodeURIComponent(
     `Hola, me interesa la propiedad ${propiedad.codigo}: "${propiedad.titulo}". Quisiera mas informacion.`
   );
 
-  const telefonoAsesor = propiedad.asesor?.telefono || "50379889533";
-  const nombreAsesor = propiedad.asesor?.nombre || "Mario Rivas";
-  const displayAsesor = propiedad.asesor?.telefonoDisplay || "7988-9533";
-  const cargoAsesor = propiedad.asesor?.cargo || "Asesor Inmobiliario";
-  const emailAsesor = propiedad.asesor?.email || "info@estucasasv.com";
+  const telefonoAsesor =
+    propiedad.asesor?.telefono || "50379889533";
+
+  const nombreAsesor =
+    propiedad.asesor?.nombre || "Mario Rivas";
+
+  const displayAsesor =
+    propiedad.asesor?.telefonoDisplay || "7988-9533";
+
+  const cargoAsesor =
+    propiedad.asesor?.cargo ||
+    "Asesor Inmobiliario";
+
+  const emailAsesor =
+    propiedad.asesor?.email ||
+    "info@estucasasv.com";
 
   const nextImage = () => {
     if (allImages.length === 0) return;
-    setActiveImage((prev) => (prev + 1) % allImages.length);
+
+    setActiveImage(
+      (prev) => (prev + 1) % allImages.length
+    );
   };
 
   const prevImage = () => {
     if (allImages.length === 0) return;
-    setActiveImage((prev) => (prev - 1 + allImages.length) % allImages.length);
+
+    setActiveImage(
+      (prev) =>
+        (prev - 1 + allImages.length) %
+        allImages.length
+    );
   };
+
+  const descripcionEsPortableText = Array.isArray(
+    propiedad.descripcionLarga
+  );
 
   return (
     <div className="bg-cream text-ink min-h-screen">
@@ -90,17 +131,29 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
       <section className="pt-28 px-6 md:px-12 pb-8">
         <div className="max-w-[1440px] mx-auto">
           <div className="flex items-center gap-2 text-xs text-ink-soft mb-6 flex-wrap">
-            <Link href="/" className="opacity-70 hover:opacity-100">
+            <Link
+              href="/"
+              className="opacity-70 hover:opacity-100"
+            >
               <span>Inicio</span>
             </Link>
 
-            <ChevronRight size={12} className="opacity-40" />
+            <ChevronRight
+              size={12}
+              className="opacity-40"
+            />
 
-            <Link href="/propiedades" className="opacity-70 hover:opacity-100">
+            <Link
+              href="/propiedades"
+              className="opacity-70 hover:opacity-100"
+            >
               <span>Propiedades</span>
             </Link>
 
-            <ChevronRight size={12} className="opacity-40" />
+            <ChevronRight
+              size={12}
+              className="opacity-40"
+            />
 
             <span className="text-brand-blue font-medium truncate max-w-[200px] md:max-w-none">
               {propiedad.titulo}
@@ -132,6 +185,7 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
               {propiedad.zona ? (
                 <div className="flex items-center gap-2 text-ink-soft">
                   <MapPin size={16} />
+
                   <span>
                     {propiedad.zona.nombre}
                     {propiedad.zona.municipio
@@ -144,8 +198,12 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
 
             <div className="text-right">
               <div className="display text-4xl md:text-5xl text-brand-blue">
-                <span className="italic-display text-2xl text-sun">$</span>
-                {propiedad.precio.toLocaleString()}
+                <span className="italic-display text-2xl text-sun">
+                  $
+                </span>
+
+                {propiedad.precio?.toLocaleString() ||
+                  "0"}
               </div>
 
               {pricePerSqm ? (
@@ -164,7 +222,11 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
           <div className="max-w-[1440px] mx-auto">
             <div className="relative aspect-[16/9] rounded-3xl overflow-hidden bg-stone">
               <img
-                src={getImageUrl(allImages[activeImage], 1600, 900)}
+                src={getImageUrl(
+                  allImages[activeImage],
+                  1600,
+                  900
+                )}
                 alt={propiedad.titulo}
                 className="w-full h-full object-cover"
               />
@@ -190,7 +252,8 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
                   </button>
 
                   <div className="absolute bottom-4 right-4 bg-ink/80 text-cream px-3 py-1.5 rounded-full text-xs">
-                    {activeImage + 1} / {allImages.length}
+                    {activeImage + 1} /{" "}
+                    {allImages.length}
                   </div>
                 </>
               ) : null}
@@ -198,106 +261,136 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
 
             {allImages.length > 1 ? (
               <div className="flex gap-2 mt-3 overflow-x-auto pb-2">
-                {allImages.map((img: any, index: number) => (
-                  <button
-                    key={index}
-                    type="button"
-                    onClick={() => setActiveImage(index)}
-                    className={
-                      "flex-shrink-0 w-24 h-16 rounded-xl overflow-hidden transition-all " +
-                      (index === activeImage
-                        ? "ring-2 ring-brand-blue"
-                        : "opacity-60 hover:opacity-100")
-                    }
-                  >
-                    <img
-                      src={getImageUrl(img, 200, 150)}
-                      alt={`Vista ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
-                ))}
+                {allImages.map(
+                  (img: any, index: number) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() =>
+                        setActiveImage(index)
+                      }
+                      className={
+                        "flex-shrink-0 w-24 h-16 rounded-xl overflow-hidden transition-all " +
+                        (index === activeImage
+                          ? "ring-2 ring-brand-blue"
+                          : "opacity-60 hover:opacity-100")
+                      }
+                    >
+                      <img
+                        src={getImageUrl(
+                          img,
+                          200,
+                          150
+                        )}
+                        alt={`Vista ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  )
+                )}
               </div>
             ) : null}
           </div>
         </section>
       ) : null}
 
-      {/* CONTENIDO Y SIDEBAR */}
+      {/* CONTENIDO */}
       <section className="px-6 md:px-12 pb-16">
         <div className="max-w-[1440px] mx-auto grid lg:grid-cols-[1fr_400px] gap-12">
           <div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
               {propiedad.habitaciones ? (
                 <div className="bg-cream-warm rounded-2xl p-5 border border-black/5">
-                  <Bed size={20} className="text-brand-blue mb-2" />
+                  <Bed
+                    size={20}
+                    className="text-brand-blue mb-2"
+                  />
+
                   <div className="display text-2xl">
                     {propiedad.habitaciones}
                   </div>
-                  <div className="text-xs text-ink-soft">Habitaciones</div>
+
+                  <div className="text-xs text-ink-soft">
+                    Habitaciones
+                  </div>
                 </div>
               ) : null}
 
               {propiedad.banosCompletos ? (
                 <div className="bg-cream-warm rounded-2xl p-5 border border-black/5">
-                  <Bath size={20} className="text-brand-blue mb-2" />
+                  <Bath
+                    size={20}
+                    className="text-brand-blue mb-2"
+                  />
+
                   <div className="display text-2xl">
                     {propiedad.banosCompletos}
                   </div>
-                  <div className="text-xs text-ink-soft">Banos</div>
+
+                  <div className="text-xs text-ink-soft">
+                    Banos
+                  </div>
                 </div>
               ) : null}
 
               {propiedad.areaConstruccion ? (
                 <div className="bg-cream-warm rounded-2xl p-5 border border-black/5">
-                  <Square size={20} className="text-brand-blue mb-2" />
+                  <Square
+                    size={20}
+                    className="text-brand-blue mb-2"
+                  />
+
                   <div className="display text-2xl">
                     {propiedad.areaConstruccion}
                   </div>
-                  <div className="text-xs text-ink-soft">m2 construccion</div>
+
+                  <div className="text-xs text-ink-soft">
+                    m2 construccion
+                  </div>
                 </div>
               ) : null}
 
               {propiedad.areaTerreno ? (
                 <div className="bg-cream-warm rounded-2xl p-5 border border-black/5">
-                  <Layers size={20} className="text-brand-blue mb-2" />
+                  <Layers
+                    size={20}
+                    className="text-brand-blue mb-2"
+                  />
+
                   <div className="display text-2xl">
                     {propiedad.areaTerreno}
                   </div>
-                  <div className="text-xs text-ink-soft">m2 terreno</div>
+
+                  <div className="text-xs text-ink-soft">
+                    m2 terreno
+                  </div>
                 </div>
               ) : null}
 
               {propiedad.parqueos ? (
                 <div className="bg-cream-warm rounded-2xl p-5 border border-black/5">
-                  <Car size={20} className="text-brand-blue mb-2" />
-                  <div className="display text-2xl">{propiedad.parqueos}</div>
-                  <div className="text-xs text-ink-soft">Parqueos</div>
-                </div>
-              ) : null}
+                  <Car
+                    size={20}
+                    className="text-brand-blue mb-2"
+                  />
 
-              {propiedad.anoConstruccion ? (
-                <div className="bg-cream-warm rounded-2xl p-5 border border-black/5">
-                  <Calendar size={20} className="text-brand-blue mb-2" />
                   <div className="display text-2xl">
-                    {propiedad.anoConstruccion}
+                    {propiedad.parqueos}
                   </div>
-                  <div className="text-xs text-ink-soft">Ano construccion</div>
-                </div>
-              ) : null}
 
-              {propiedad.niveles ? (
-                <div className="bg-cream-warm rounded-2xl p-5 border border-black/5">
-                  <Layers size={20} className="text-brand-blue mb-2" />
-                  <div className="display text-2xl">{propiedad.niveles}</div>
-                  <div className="text-xs text-ink-soft">Niveles</div>
+                  <div className="text-xs text-ink-soft">
+                    Parqueos
+                  </div>
                 </div>
               ) : null}
             </div>
 
             {propiedad.descripcionCorta ? (
               <div className="reveal mb-10">
-                <div className="eyebrow text-sun mb-3">Resumen</div>
+                <div className="eyebrow text-sun mb-3">
+                  Resumen
+                </div>
+
                 <p className="text-lg leading-relaxed text-ink font-light">
                   {propiedad.descripcionCorta}
                 </p>
@@ -306,56 +399,42 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
 
             {propiedad.descripcionLarga ? (
               <div className="reveal mb-10">
-                <div className="eyebrow text-sun mb-3">Descripcion</div>
-                <div className="text-[15px] leading-relaxed text-ink-soft font-light whitespace-pre-wrap">
-                  {propiedad.descripcionLarga}
+                <div className="eyebrow text-sun mb-3">
+                  Descripcion
                 </div>
-              </div>
-            ) : null}
 
-            {propiedad.amenidades && propiedad.amenidades.length > 0 ? (
-              <div className="reveal mb-10">
-                <div className="eyebrow text-sun mb-4">Amenidades</div>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {propiedad.amenidades.map(
-                    (amenidad: string, index: number) => (
-                      <div
-                        key={index}
-                        className="flex items-center gap-2 text-sm py-2 px-4 bg-cream-warm rounded-full border border-black/5"
-                      >
-                        <span className="w-1.5 h-1.5 rounded-full bg-brand-blue" />
-                        <span>{amenidad}</span>
-                      </div>
-                    )
+                <div className="text-[15px] leading-relaxed text-ink-soft font-light space-y-4">
+                  {descripcionEsPortableText ? (
+                    <PortableText
+                      value={
+                        propiedad.descripcionLarga
+                      }
+                    />
+                  ) : (
+                    <p className="whitespace-pre-wrap">
+                      {propiedad.descripcionLarga}
+                    </p>
                   )}
-                </div>
-              </div>
-            ) : null}
-
-            {propiedad.videoYoutube ? (
-              <div className="reveal mb-10">
-                <div className="eyebrow text-sun mb-3">Video tour</div>
-                <div className="aspect-video rounded-2xl overflow-hidden bg-ink">
-                  <iframe
-                    src={propiedad.videoYoutube.replace("watch?v=", "embed/")}
-                    title="Video tour"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    className="w-full h-full"
-                  />
                 </div>
               </div>
             ) : null}
           </div>
 
+          {/* SIDEBAR */}
           <aside className="lg:sticky lg:top-28 self-start">
             <div className="bg-cream-warm border border-black/10 rounded-3xl p-7">
-              <div className="eyebrow text-sun mb-4">Asesor asignado</div>
+              <div className="eyebrow text-sun mb-4">
+                Asesor asignado
+              </div>
 
               <div className="flex items-center gap-4 mb-6 pb-6 border-b border-black/10">
-                {propiedad.asesor?.foto && propiedad.asesor.foto.asset ? (
+                {propiedad.asesor?.foto?.asset ? (
                   <img
-                    src={getImageUrl(propiedad.asesor.foto, 120, 120)}
+                    src={getImageUrl(
+                      propiedad.asesor.foto,
+                      120,
+                      120
+                    )}
                     alt={nombreAsesor}
                     className="w-16 h-16 rounded-full object-cover"
                   />
@@ -366,22 +445,45 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
                 )}
 
                 <div>
-                  <div className="display text-xl">{nombreAsesor}</div>
-                  <div className="text-xs text-ink-soft">{cargoAsesor}</div>
+                  <div className="display text-xl">
+                    {nombreAsesor}
+                  </div>
+
+                  <div className="text-xs text-ink-soft">
+                    {cargoAsesor}
+                  </div>
                 </div>
               </div>
 
               <div className="space-y-3 mb-6 text-sm">
                 <div className="flex items-center gap-3">
-                  <MessageCircle size={16} className="text-brand-blue" />
-                  <span className="text-ink-soft">WhatsApp:</span>
-                  <span className="font-medium">{displayAsesor}</span>
+                  <MessageCircle
+                    size={16}
+                    className="text-brand-blue"
+                  />
+
+                  <span className="text-ink-soft">
+                    WhatsApp:
+                  </span>
+
+                  <span className="font-medium">
+                    {displayAsesor}
+                  </span>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <Mail size={16} className="text-brand-blue" />
-                  <span className="text-ink-soft">Email:</span>
-                  <span className="font-medium text-xs">{emailAsesor}</span>
+                  <Mail
+                    size={16}
+                    className="text-brand-blue"
+                  />
+
+                  <span className="text-ink-soft">
+                    Email:
+                  </span>
+
+                  <span className="font-medium text-xs">
+                    {emailAsesor}
+                  </span>
                 </div>
               </div>
 
@@ -392,7 +494,10 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
                   rel="noopener noreferrer"
                   className="w-full bg-brand-blue text-cream px-6 py-4 rounded-full text-sm font-medium inline-flex items-center justify-center gap-2 hover:bg-brand-blue-deep transition-colors"
                 >
-                  <span>Escribir por WhatsApp</span>
+                  <span>
+                    Escribir por WhatsApp
+                  </span>
+
                   <ArrowUpRight size={14} />
                 </a>
 
@@ -405,14 +510,16 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
               </div>
 
               <div className="mt-6 pt-6 border-t border-black/10 text-xs text-ink-soft text-center">
-                <span>Codigo: {propiedad.codigo}</span>
+                <span>
+                  Codigo: {propiedad.codigo}
+                </span>
               </div>
             </div>
           </aside>
         </div>
       </section>
 
-      {/* CTA inferior */}
+      {/* CTA FINAL */}
       <section className="reveal px-6 md:px-12 pb-24">
         <div className="max-w-[1000px] mx-auto">
           <div className="bg-brand-blue text-cream rounded-3xl p-12 md:p-16 text-center">
@@ -422,12 +529,16 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
 
             <h2 className="display text-3xl md:text-4xl mb-5">
               <span>Agenda una </span>
-              <span className="italic-display text-sun">visita.</span>
+
+              <span className="italic-display text-sun">
+                visita.
+              </span>
             </h2>
 
             <p className="text-base opacity-85 max-w-[540px] mx-auto mb-7 font-light leading-relaxed">
-              Coordinamos visitas presenciales o video-tours en directo segun
-              prefieras. Atencion personalizada sin presion comercial.
+              Coordinamos visitas presenciales o
+              video-tours en directo segun
+              prefieras.
             </p>
 
             <a
@@ -437,8 +548,11 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
               className="bg-sun text-brand-blue-deep px-7 py-4 rounded-full text-sm font-semibold inline-flex items-center gap-2 hover:bg-sun-soft transition-colors"
             >
               <span>
-                WhatsApp {nombreAsesor.split(" ")[0]} - {displayAsesor}
+                WhatsApp{" "}
+                {nombreAsesor.split(" ")[0]} -{" "}
+                {displayAsesor}
               </span>
+
               <ArrowUpRight size={14} />
             </a>
           </div>
