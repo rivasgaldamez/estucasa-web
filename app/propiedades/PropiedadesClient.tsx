@@ -22,16 +22,17 @@ type Props = {
   propiedades: any[];
 };
 
-const tiposPropiedad = [
-  { match: "todas", label: "Todas" },
-  { match: "casa", label: "Casas" },
-  { match: "apartamento", label: "Apartamentos" },
-  { match: "terreno", label: "Terrenos" },
-  { match: "comercial", label: "Comerciales" },
+const filtros = [
+  { match: "todas", label: "Todas", campo: "todas" },
+  { match: "casa", label: "Casas", campo: "tipo" },
+  { match: "apartamento", label: "Apartamentos", campo: "tipo" },
+  { match: "terreno", label: "Terrenos", campo: "tipo" },
+  { match: "comercial", label: "Comerciales", campo: "tipo" },
+  { match: "alquiler", label: "Alquileres", campo: "operacion" },
 ];
 
 export default function PropiedadesClient({ propiedades }: Props) {
-  const [activeTipo, setActiveTipo] = useState<string>("todas");
+  const [activeFiltro, setActiveFiltro] = useState<string>("todas");
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
@@ -62,10 +63,15 @@ export default function PropiedadesClient({ propiedades }: Props) {
   const filtered = useMemo(() => {
     let result = [...propiedades];
 
-    if (activeTipo !== "todas") {
+    const filtroActivo = filtros.find((f) => f.match === activeFiltro);
+
+    if (filtroActivo && filtroActivo.match !== "todas") {
+      const campo = filtroActivo.campo;
+      const palabra = filtroActivo.match;
+
       result = result.filter((propiedad) => {
-        const tipoProp = (propiedad.tipo || "").toLowerCase();
-        return tipoProp.includes(activeTipo);
+        const valorCampo = (propiedad[campo] || "").toLowerCase();
+        return valorCampo.includes(palabra);
       });
     }
 
@@ -82,13 +88,12 @@ export default function PropiedadesClient({ propiedades }: Props) {
     }
 
     return result;
-  }, [activeTipo, searchQuery, propiedades]);
+  }, [activeFiltro, searchQuery, propiedades]);
 
   return (
     <div className="bg-cream text-ink min-h-screen">
       <Navbar />
 
-      {/* HERO */}
       <section className="pt-32 px-6 md:px-12 pb-12">
         <div className="max-w-[1440px] mx-auto">
           <div className="flex items-center gap-2 text-xs text-ink-soft mb-6">
@@ -112,7 +117,7 @@ export default function PropiedadesClient({ propiedades }: Props) {
 
               <p className="text-lg text-ink-soft max-w-[600px] font-light leading-relaxed">
                 Casas, apartamentos, terrenos y propiedades comerciales en todo
-                el pais. Filtra por tipo o busca por zona.
+                el pais. Filtra por tipo, alquiler o busca por zona.
               </p>
             </div>
 
@@ -131,22 +136,21 @@ export default function PropiedadesClient({ propiedades }: Props) {
         </div>
       </section>
 
-      {/* FILTROS */}
       <section className="px-6 md:px-12 pb-10">
         <div className="max-w-[1440px] mx-auto">
           <div className="flex gap-2.5 overflow-x-auto pb-3 mb-4">
-            {tiposPropiedad.map((tipo) => (
+            {filtros.map((filtro) => (
               <button
-                key={tipo.match}
+                key={filtro.match}
                 type="button"
-                onClick={() => setActiveTipo(tipo.match)}
+                onClick={() => setActiveFiltro(filtro.match)}
                 className={
-                  activeTipo === tipo.match
+                  activeFiltro === filtro.match
                     ? "px-5 py-2.5 rounded-full text-sm font-medium border whitespace-nowrap bg-ink text-cream border-ink"
                     : "px-5 py-2.5 rounded-full text-sm font-medium border whitespace-nowrap bg-cream text-ink border-black/10 hover:border-brand-blue transition-colors"
                 }
               >
-                <span>{tipo.label}</span>
+                <span>{filtro.label}</span>
               </button>
             ))}
           </div>
@@ -178,7 +182,6 @@ export default function PropiedadesClient({ propiedades }: Props) {
         </div>
       </section>
 
-      {/* RESULTS */}
       <section className="px-6 md:px-12 pb-24">
         <div className="max-w-[1440px] mx-auto">
           {filtered.length === 0 ? (
@@ -190,7 +193,7 @@ export default function PropiedadesClient({ propiedades }: Props) {
               </h3>
 
               <p className="text-sm text-ink-soft max-w-md mx-auto font-light">
-                No encontramos propiedades con esos filtros. Probá cambiar el
+                No encontramos propiedades con esos filtros. Proba cambiar el
                 tipo o limpiar la busqueda.
               </p>
             </div>
@@ -235,6 +238,7 @@ export default function PropiedadesClient({ propiedades }: Props) {
                   {propiedad.zona ? (
                     <div className="flex items-center gap-1.5 text-xs text-ink-soft mb-3">
                       <MapPin size={11} />
+
                       <span>
                         {propiedad.zona.nombre}
                         {propiedad.zona.municipio
@@ -285,7 +289,6 @@ export default function PropiedadesClient({ propiedades }: Props) {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="reveal px-6 md:px-12 pb-24">
         <div className="max-w-[1000px] mx-auto">
           <div className="bg-brand-blue text-cream rounded-3xl p-12 md:p-16 relative overflow-hidden text-center">
