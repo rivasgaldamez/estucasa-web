@@ -79,8 +79,8 @@ export default function Navbar({ variant = "light" }: NavbarProps) {
             <Image
               src="/logo.png"
               alt="ES Tu Casa Inmobiliaria - Inicio"
-              width={56}
-              height={56}
+              width={80}
+              height={80}
               className="object-contain transition-transform group-hover:scale-105"
               priority
             />
