@@ -6,7 +6,7 @@ export const sanityClient = createClient({
   projectId: "u5c3y71c",
   dataset: "production",
   apiVersion: "2024-01-01",
-  useCdn: true,
+  useCdn: false,
 });
 
 // Helper para generar URLs de imagenes
