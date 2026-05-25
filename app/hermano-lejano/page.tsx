@@ -97,7 +97,7 @@ export default function HermanoLejanoPage() {
   const faqs = [
     {
       q: "Cuanto tarda todo el proceso?",
-      a: "Entre 45 y 90 dias desde la primera llamada hasta la entrega de llaves, dependiendo de financiamiento y tipo de propiedad.",
+      a: "Entre 45 y 90 días desde la primera llamada hasta la entrega de llaves, dependiendo de financiamiento y tipo de propiedad.",
     },
     {
       q: "Puedo usar financiamiento bancario desde El Salvador?",
@@ -425,7 +425,7 @@ export default function HermanoLejanoPage() {
             </a>
 
             <a
-              href="https://wa.me/50377303994"
+              href="https://wa.me/50373963858"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-sun text-brand-blue-deep px-7 py-4 rounded-full text-sm font-semibold inline-flex items-center gap-2 hover:bg-sun-soft transition-colors"

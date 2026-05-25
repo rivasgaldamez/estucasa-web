@@ -46,7 +46,7 @@ export function getOrganizationSchema() {
         "@type": "Person",
         name: "Carlos Díaz",
         jobTitle: "Socio Fundador - Asesor Comercial",
-        telephone: "+50377303494",
+        telephone: "+50373963858",
         email: "info@estucasasv.com",
       },
     ],
@@ -84,7 +84,7 @@ export function getOrganizationSchema() {
       },
       {
         "@type": "ContactPoint",
-        telephone: "+50377303494",
+        telephone: "+50373963858",
         contactType: "Sales",
         areaServed: ["SV"],
         availableLanguage: ["Spanish"],
