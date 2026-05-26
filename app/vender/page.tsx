@@ -156,7 +156,7 @@ export default function VenderPage() {
     },
     {
       q: "Necesito un avaluo profesional?",
-      a: "Para vender al mercado, nuestra orientacion suele ser suficiente. Para tramites oficiales como banco, herencia o divorcio, necesitas un avaluo formal con perito autorizado. Si es tu caso, te referimos a uno de confianza.",
+      a: "Sí, lo recomendamos. Un avalúo formal con perito autorizado te da un precio certero y respaldado: evita que vendas por debajo del valor real de mercado o que pongas un precio tan alto que la propiedad no se venda. Además, es indispensable para trámites oficiales como banco, herencia o divorcio. Si lo necesitás, te referimos a un perito de confianza.",
     },
     {
       q: "Como manejan las visitas si yo no puedo estar?",
@@ -839,11 +839,11 @@ export default function VenderPage() {
 
                   <button
                     type="button"
-                    onClick={() => enviarAWhatsApp("50377303994")}
+                    onClick={() => enviarAWhatsApp("50373963858")}
                     className="bg-sun text-brand-blue-deep px-7 py-4 rounded-full text-sm font-semibold inline-flex items-center gap-2 hover:bg-sun-soft transition-colors"
                   >
                     <MessageCircle size={16} />
-                    <span>Enviar a Carlos - 7730-3994</span>
+                    <span>Enviar a Carlos - 7396-3858</span>
                   </button>
                 </div>
 
