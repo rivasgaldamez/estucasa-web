@@ -91,20 +91,17 @@ export default function Footer() {
               </a>
 
               <a
-                href="https://wa.me/50377303994"
+                href="https://wa.me/50373963858"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-sun transition"
               >
-                <span>Carlos - 7730-3994</span>
+                <span>Carlos - 7396-3858</span>
               </a>
 
-              <a
-                href="mailto:info@estucasasv.com"
-                className="hover:text-sun transition"
-              >
-                <span>info@estucasasv.com</span>
-              </a>
+              <a href="mailto:estucasasv@gmail.com" className="hover:text-yellow-400 transition">
+  estucasasv@gmail.com
+</a>
 
               <span>San Salvador, SV</span>
             </div>
