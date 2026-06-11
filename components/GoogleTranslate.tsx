@@ -9,15 +9,33 @@ declare global {
   }
 }
 
+// Guardamos el selector original para reutilizarlo al navegar
+let cachedWidget: HTMLElement | null = null;
+let scriptLoaded = false;
+
 export default function GoogleTranslate() {
   const pathname = usePathname();
 
   useEffect(() => {
-    const init = () => {
+    const timer = setTimeout(() => {
       const wrapper = document.querySelector(".gtranslate_wrapper");
+      if (!wrapper) return;
 
-      // Si no hay wrapper en esta página, o ya tiene el selector, no hacer nada
-      if (!wrapper || wrapper.childElementCount > 0) return;
+      // Si el wrapper ya tiene el selector, guardamos referencia y listo
+      if (wrapper.childElementCount > 0) {
+        cachedWidget = wrapper.firstElementChild as HTMLElement;
+        return;
+      }
+
+      // Si ya teníamos el selector guardado, lo movemos al wrapper nuevo
+      if (cachedWidget) {
+        wrapper.appendChild(cachedWidget);
+        return;
+      }
+
+      // Primera carga: configurar y cargar el script UNA sola vez
+      if (scriptLoaded) return;
+      scriptLoaded = true;
 
       window.gtranslateSettings = {
         default_language: "es",
@@ -25,18 +43,23 @@ export default function GoogleTranslate() {
         wrapper_selector: ".gtranslate_wrapper",
       };
 
-      // Quitar el script anterior y volver a cargarlo para que reinserte el selector
-      document.getElementById("gtranslate-script")?.remove();
-
       const script = document.createElement("script");
       script.id = "gtranslate-script";
       script.src = "https://cdn.gtranslate.net/widgets/latest/dropdown.js";
       script.defer = true;
-      document.body.appendChild(script);
-    };
 
-    // Pequeña espera para asegurar que el navbar ya está montado
-    const timer = setTimeout(init, 300);
+      script.onload = () => {
+        // Cuando el script termine de crear el selector, lo guardamos
+        setTimeout(() => {
+          const w = document.querySelector(".gtranslate_wrapper");
+          if (w?.firstElementChild) {
+            cachedWidget = w.firstElementChild as HTMLElement;
+          }
+        }, 500);
+      };
+
+      document.body.appendChild(script);
+    }, 300);
 
     return () => clearTimeout(timer);
   }, [pathname]);
