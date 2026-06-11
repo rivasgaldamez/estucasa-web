@@ -95,6 +95,24 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={jsonLdScript(websiteSchema)}
         />
+
+        {/* Google Translate */}
+        <script
+          async
+          src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
+        ></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.googleTranslateElementInit = function() {
+                new google.translate.TranslateElement(
+                  { pageLanguage: 'es', includedLanguages: 'es,en,fr,ja,pt,zh-CN,ko' },
+                  'google_translate_element'
+                );
+              };
+            `,
+          }}
+        />
       </head>
 
       <body className="antialiased">

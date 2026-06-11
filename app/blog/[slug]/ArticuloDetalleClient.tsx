@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, type ReactNode } from "react";
 import Link from "next/link";
 import {
   ArrowUpRight,
@@ -13,11 +14,12 @@ import {
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Torogoz from "@/components/Torogoz";
+import Infografia from "@/components/infografias/Infografia";
 import { urlFor } from "@/lib/sanity";
 
 type Props = {
   articulo: any;
-  relacionados: any[];
+  relacionados?: any[];
 };
 
 const colorClasses: Record<string, string> = {
@@ -29,7 +31,7 @@ const colorClasses: Record<string, string> = {
 
 export default function ArticuloDetalleClient({
   articulo,
-  relacionados,
+  relacionados = [],
 }: Props) {
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -47,7 +49,7 @@ export default function ArticuloDetalleClient({
   }, []);
 
   const getImageUrl = (image: any, w = 1600, h = 900) => {
-    if (!image || !image.asset) return "";
+    if (!image?.asset) return "";
 
     try {
       return urlFor(image).width(w).height(h).url();
@@ -56,7 +58,7 @@ export default function ArticuloDetalleClient({
     }
   };
 
-  const formatearFecha = (fecha: string) => {
+  const formatearFecha = (fecha?: string) => {
     if (!fecha) return "";
 
     const d = new Date(fecha);
@@ -81,13 +83,32 @@ export default function ArticuloDetalleClient({
     return `${d.getDate()} de ${meses[d.getMonth()]}, ${d.getFullYear()}`;
   };
 
+  const tituloArticulo = articulo?.titulo || "este artículo";
+
   const whatsappMsg = encodeURIComponent(
-    `Hola, leí su artículo "${articulo.titulo}" y me gustaría más información.`
+    `Hola, leí su artículo "${tituloArticulo}" y me gustaría más información.`
   );
 
-  const telefonoAutor = articulo.autor?.telefono || "50379889533";
-  const nombreAutor = articulo.autor?.nombre || "Mario Rivas";
-  const displayAutor = articulo.autor?.telefonoDisplay || "7988-9533";
+  const telefonoAutor = String(
+    articulo?.autor?.telefono || "50379889533"
+  ).replace(/\D/g, "");
+
+  const nombreAutor = articulo?.autor?.nombre || "Mario Rivas";
+  const displayAutor = articulo?.autor?.telefonoDisplay || "7988-9533";
+
+  const renderTextoConMarcas = (child: any): ReactNode => {
+    let element: ReactNode = child.text || "";
+
+    if (child.marks?.includes("strong")) {
+      element = <strong>{element}</strong>;
+    }
+
+    if (child.marks?.includes("em")) {
+      element = <em>{element}</em>;
+    }
+
+    return element;
+  };
 
   return (
     <div className="bg-cream text-ink min-h-screen">
@@ -107,15 +128,17 @@ export default function ArticuloDetalleClient({
               <span>Blog</span>
             </Link>
 
-            {articulo.categoria ? (
+            {articulo?.categoria ? (
               <>
                 <ChevronRight size={12} className="opacity-40" />
-                <span className="opacity-70">{articulo.categoria.nombre}</span>
+                <span className="opacity-70">
+                  {articulo.categoria.nombre}
+                </span>
               </>
             ) : null}
           </div>
 
-          {articulo.categoria ? (
+          {articulo?.categoria ? (
             <span
               className={
                 "inline-block px-3 py-1.5 rounded-full text-[11px] tracking-[0.18em] uppercase font-semibold mb-6 " +
@@ -128,27 +151,27 @@ export default function ArticuloDetalleClient({
           ) : null}
 
           <h1 className="display text-4xl md:text-6xl lg:text-7xl mb-6 leading-tight">
-            {articulo.titulo}
+            {tituloArticulo}
           </h1>
 
-          {articulo.extracto ? (
+          {articulo?.extracto ? (
             <p className="text-xl text-ink-soft mb-8 leading-relaxed font-light max-w-[700px]">
               {articulo.extracto}
             </p>
           ) : null}
 
           <div className="flex items-center gap-6 text-sm text-ink-soft pb-8 border-b border-black/10 flex-wrap">
-            {articulo.autor ? (
+            {articulo?.autor ? (
               <div className="flex items-center gap-3">
-                {articulo.autor.foto && articulo.autor.foto.asset ? (
+                {articulo.autor.foto?.asset ? (
                   <img
                     src={getImageUrl(articulo.autor.foto, 80, 80)}
-                    alt={articulo.autor.nombre}
+                    alt={articulo.autor.nombre || "Autor"}
                     className="w-10 h-10 rounded-full object-cover"
                   />
                 ) : (
                   <div className="w-10 h-10 rounded-full bg-brand-blue text-cream flex items-center justify-center font-medium">
-                    {articulo.autor.nombre.charAt(0)}
+                    {articulo.autor.nombre?.charAt(0) || "M"}
                   </div>
                 )}
 
@@ -164,12 +187,14 @@ export default function ArticuloDetalleClient({
               </div>
             ) : null}
 
-            <div className="flex items-center gap-1.5">
-              <Calendar size={14} />
-              <span>{formatearFecha(articulo.fechaPublicacion)}</span>
-            </div>
+            {articulo?.fechaPublicacion ? (
+              <div className="flex items-center gap-1.5">
+                <Calendar size={14} />
+                <span>{formatearFecha(articulo.fechaPublicacion)}</span>
+              </div>
+            ) : null}
 
-            {articulo.tiempoLectura ? (
+            {articulo?.tiempoLectura ? (
               <div className="flex items-center gap-1.5">
                 <Clock size={14} />
                 <span>{articulo.tiempoLectura} min de lectura</span>
@@ -180,13 +205,13 @@ export default function ArticuloDetalleClient({
       </section>
 
       {/* IMAGEN PORTADA */}
-      {articulo.imagenPortada ? (
+      {articulo?.imagenPortada ? (
         <section className="px-6 md:px-12 pb-12">
           <div className="max-w-[1100px] mx-auto">
             <div className="aspect-[16/9] rounded-3xl overflow-hidden bg-stone">
               <img
                 src={getImageUrl(articulo.imagenPortada, 1600, 900)}
-                alt={articulo.titulo}
+                alt={tituloArticulo}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -198,7 +223,7 @@ export default function ArticuloDetalleClient({
       <section className="px-6 md:px-12 pb-16">
         <div className="max-w-[760px] mx-auto">
           <article className="prose-articulo">
-            {articulo.contenido && articulo.contenido.length > 0 ? (
+            {articulo?.contenido && articulo.contenido.length > 0 ? (
               articulo.contenido.map((block: any, i: number) => {
                 if (block._type === "block") {
                   const text = block.children
@@ -208,7 +233,7 @@ export default function ArticuloDetalleClient({
                   if (block.style === "h2") {
                     return (
                       <h2
-                        key={i}
+                        key={block._key || i}
                         className="display text-3xl md:text-4xl mt-12 mb-5"
                       >
                         {text}
@@ -219,7 +244,7 @@ export default function ArticuloDetalleClient({
                   if (block.style === "h3") {
                     return (
                       <h3
-                        key={i}
+                        key={block._key || i}
                         className="display text-2xl md:text-3xl mt-10 mb-4"
                       >
                         {text}
@@ -230,7 +255,7 @@ export default function ArticuloDetalleClient({
                   if (block.style === "blockquote") {
                     return (
                       <blockquote
-                        key={i}
+                        key={block._key || i}
                         className="border-l-4 border-sun pl-6 my-8 italic-display text-2xl text-ink-soft"
                       >
                         {text}
@@ -241,7 +266,7 @@ export default function ArticuloDetalleClient({
                   if (block.listItem === "bullet") {
                     return (
                       <li
-                        key={i}
+                        key={block._key || i}
                         className="text-lg leading-relaxed text-ink mb-2 ml-6 list-disc"
                       >
                         {text}
@@ -252,7 +277,7 @@ export default function ArticuloDetalleClient({
                   if (block.listItem === "number") {
                     return (
                       <li
-                        key={i}
+                        key={block._key || i}
                         className="text-lg leading-relaxed text-ink mb-2 ml-6 list-decimal"
                       >
                         {text}
@@ -262,23 +287,15 @@ export default function ArticuloDetalleClient({
 
                   return (
                     <p
-                      key={i}
+                      key={block._key || i}
                       className="text-lg leading-relaxed text-ink mb-5"
                     >
                       {block.children
-                        ? block.children.map((child: any, j: number) => {
-                            let element = child.text || "";
-
-                            if (child.marks?.includes("strong")) {
-                              element = <strong>{element}</strong>;
-                            }
-
-                            if (child.marks?.includes("em")) {
-                              element = <em>{element}</em>;
-                            }
-
-                            return <span key={j}>{element}</span>;
-                          })
+                        ? block.children.map((child: any, j: number) => (
+                            <span key={child._key || j}>
+                              {renderTextoConMarcas(child)}
+                            </span>
+                          ))
                         : ""}
                     </p>
                   );
@@ -286,11 +303,11 @@ export default function ArticuloDetalleClient({
 
                 if (block._type === "image" && block.asset) {
                   return (
-                    <figure key={i} className="my-10">
+                    <figure key={block._key || i} className="my-10">
                       <div className="aspect-[16/9] rounded-2xl overflow-hidden bg-stone">
                         <img
                           src={getImageUrl(block, 1200, 675)}
-                          alt={block.alt || ""}
+                          alt={block.alt || tituloArticulo}
                           className="w-full h-full object-cover"
                         />
                       </div>
@@ -304,11 +321,19 @@ export default function ArticuloDetalleClient({
                   );
                 }
 
+                if (block._type === "infografia") {
+                  return (
+                    <div key={block._key || i} className="my-12">
+                      <Infografia tipo={block.tipo} />
+                    </div>
+                  );
+                }
+
                 return null;
               })
             ) : (
               <p className="text-ink-soft">
-                Este articulo aun no tiene contenido.
+                Este artículo aún no tiene contenido.
               </p>
             )}
           </article>
@@ -316,20 +341,20 @@ export default function ArticuloDetalleClient({
       </section>
 
       {/* AUTOR CARD */}
-      {articulo.autor ? (
+      {articulo?.autor ? (
         <section className="reveal px-6 md:px-12 pb-16">
           <div className="max-w-[760px] mx-auto">
             <div className="bg-cream-warm border border-black/10 rounded-3xl p-8 md:p-10">
               <div className="flex items-start gap-5 flex-wrap">
-                {articulo.autor.foto && articulo.autor.foto.asset ? (
+                {articulo.autor.foto?.asset ? (
                   <img
                     src={getImageUrl(articulo.autor.foto, 200, 200)}
-                    alt={articulo.autor.nombre}
+                    alt={articulo.autor.nombre || "Autor"}
                     className="w-20 h-20 rounded-full object-cover flex-shrink-0"
                   />
                 ) : (
                   <div className="w-20 h-20 rounded-full bg-brand-blue text-cream display text-3xl flex items-center justify-center flex-shrink-0">
-                    {articulo.autor.nombre.charAt(0)}
+                    {articulo.autor.nombre?.charAt(0) || "M"}
                   </div>
                 )}
 
@@ -370,16 +395,16 @@ export default function ArticuloDetalleClient({
         </section>
       ) : null}
 
-      {/* ARTICULOS RELACIONADOS */}
+      {/* ARTÍCULOS RELACIONADOS */}
       {relacionados.length > 0 ? (
         <section className="reveal px-6 md:px-12 pb-20">
           <div className="max-w-[1200px] mx-auto">
             <div className="flex justify-between items-end mb-10 flex-wrap gap-4">
               <div>
-                <div className="eyebrow text-sun mb-3">Lee tambien</div>
+                <div className="eyebrow text-sun mb-3">Lee también</div>
 
                 <h2 className="display text-3xl md:text-4xl">
-                  <span>Articulos </span>
+                  <span>Artículos </span>
                   <span className="italic-display text-brand-blue">
                     relacionados.
                   </span>
@@ -406,7 +431,7 @@ export default function ArticuloDetalleClient({
                     {rel.imagenPortada ? (
                       <img
                         src={getImageUrl(rel.imagenPortada, 600, 450)}
-                        alt={rel.titulo}
+                        alt={rel.titulo || "Artículo relacionado"}
                         className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                       />
                     ) : null}
@@ -429,8 +454,12 @@ export default function ArticuloDetalleClient({
                   </h4>
 
                   <div className="flex items-center gap-3 text-xs text-ink-soft">
-                    <Calendar size={11} />
-                    <span>{formatearFecha(rel.fechaPublicacion)}</span>
+                    {rel.fechaPublicacion ? (
+                      <>
+                        <Calendar size={11} />
+                        <span>{formatearFecha(rel.fechaPublicacion)}</span>
+                      </>
+                    ) : null}
 
                     {rel.tiempoLectura ? (
                       <>
@@ -464,13 +493,13 @@ export default function ArticuloDetalleClient({
               </Link>
 
               <h2 className="display text-4xl md:text-5xl mb-5">
-                <span>Listo para </span>
+                <span>¿Listo para </span>
                 <span className="italic-display text-sun">conversar?</span>
               </h2>
 
               <p className="text-lg opacity-85 max-w-[540px] mx-auto mb-8 font-light leading-relaxed">
-                Si este articulo te fue util y quieres asesoria especifica para
-                tu caso, escribenos por WhatsApp.
+                Si este artículo te fue útil y quieres asesoría específica para
+                tu caso, escríbenos por WhatsApp.
               </p>
 
               <div className="flex gap-3 justify-center flex-wrap">
@@ -485,7 +514,7 @@ export default function ArticuloDetalleClient({
                 </a>
 
                 <a
-                  href="https://wa.me/50377303994"
+                  href="https://wa.me/50373963858"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-7 py-4 rounded-full text-sm font-medium inline-flex items-center gap-2 border border-white/25 text-cream hover:border-sun hover:text-sun transition-colors"

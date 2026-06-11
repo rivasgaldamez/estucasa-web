@@ -174,6 +174,7 @@ export default defineType({
             },
           ],
         },
+        { type: "infografia" }
       ],
       validation: (Rule) => Rule.required(),
     }),

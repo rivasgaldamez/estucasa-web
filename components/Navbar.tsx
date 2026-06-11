@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpRight, Home, Menu, X } from "lucide-react";
-import TranslateWidget from "./TranslateWidget";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 type NavbarProps = {
   variant?: "light" | "dark";
@@ -106,7 +106,7 @@ export default function Navbar({ variant = "light" }: NavbarProps) {
 
           {/* ACCIONES DERECHA: IDIOMA + WHATSAPP DESKTOP */}
           <div className="hidden md:flex items-center gap-3">
-            <TranslateWidget />
+            <LanguageSwitcher />
 
             <a
               href="https://wa.me/50379889533"
@@ -121,7 +121,7 @@ export default function Navbar({ variant = "light" }: NavbarProps) {
 
           {/* ACCIONES MÓVIL: IDIOMA + HAMBURGUESA */}
           <div className="flex md:hidden items-center gap-2">
-            <TranslateWidget />
+            <LanguageSwitcher />
 
             <button
               type="button"
