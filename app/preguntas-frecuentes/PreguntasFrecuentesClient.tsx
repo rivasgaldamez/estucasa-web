@@ -296,7 +296,7 @@ export default function PreguntasFrecuentesClient({ faqs }: Props) {
                   rel="noopener noreferrer"
                   className="px-7 py-4 rounded-full text-sm font-medium inline-flex items-center gap-2 border border-white/25 text-cream hover:border-sun hover:text-sun transition-colors"
                 >
-                  <span>WhatsApp Carlos - 7730-3994</span>
+                  <span>WhatsApp Carlos - 7396-3858</span>
                   <ArrowUpRight size={14} />
                 </a>
               </div>
