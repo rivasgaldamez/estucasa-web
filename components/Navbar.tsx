@@ -3,14 +3,25 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUpRight, Home, Menu, X } from "lucide-react";
-import LanguageSwitcher from "./LanguageSwitcher";
+import {
+  ArrowUpRight,
+  Home,
+  Menu,
+  X,
+  type LucideIcon,
+} from "lucide-react";
 
 type NavbarProps = {
   variant?: "light" | "dark";
 };
 
-const navLinks = [
+type NavLink = {
+  href: string;
+  label: string;
+  icon?: LucideIcon;
+};
+
+const navLinks: NavLink[] = [
   { href: "/", label: "Inicio", icon: Home },
   { href: "/propiedades", label: "Propiedades" },
   { href: "/hermano-lejano", label: "Hermano Lejano" },
@@ -104,29 +115,25 @@ export default function Navbar({ variant = "light" }: NavbarProps) {
             })}
           </div>
 
-          {/* ACCIONES DERECHA: IDIOMA + WHATSAPP DESKTOP */}
-          <div className="hidden md:flex items-center gap-3">
-            <LanguageSwitcher />
+          {/* ACCIONES DERECHA: IDIOMA + WHATSAPP DESKTOP + HAMBURGUESA MÓVIL */}
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className="gtranslate_wrapper" />
 
             <a
               href="https://wa.me/50379889533"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex bg-brand-blue text-cream px-6 py-3.5 rounded-full text-sm font-medium items-center gap-2 border border-brand-blue hover:bg-brand-blue-deep transition-colors"
+              className="hidden md:inline-flex bg-brand-blue text-cream px-6 py-3.5 rounded-full text-sm font-medium items-center gap-2 border border-brand-blue hover:bg-brand-blue-deep transition-colors"
+              aria-label="Escribir por WhatsApp"
             >
               <span>WhatsApp</span>
               <ArrowUpRight size={14} />
             </a>
-          </div>
-
-          {/* ACCIONES MÓVIL: IDIOMA + HAMBURGUESA */}
-          <div className="flex md:hidden items-center gap-2">
-            <LanguageSwitcher />
 
             <button
               type="button"
               onClick={() => setMenuOpen(true)}
-              className="inline-flex items-center justify-center w-11 h-11 rounded-full border border-current"
+              className="md:hidden inline-flex items-center justify-center w-11 h-11 rounded-full border border-current"
               aria-label="Abrir menú"
               aria-expanded={menuOpen}
               aria-controls="mobile-menu"
@@ -186,6 +193,7 @@ export default function Navbar({ variant = "light" }: NavbarProps) {
               rel="noopener noreferrer"
               onClick={() => setMenuOpen(false)}
               className="w-full bg-sun text-brand-blue-deep px-6 py-4 rounded-full text-base font-semibold inline-flex items-center justify-center gap-2"
+              aria-label="Escribir por WhatsApp"
             >
               <span>Escribinos por WhatsApp</span>
               <ArrowUpRight size={16} />

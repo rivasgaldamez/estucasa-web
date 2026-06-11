@@ -99,3 +99,30 @@ body {
   opacity: 1;
   transform: translateY(0);
 }
+
+/* ===== Selector de idiomas GTranslate ===== */
+.gtranslate_wrapper select {
+  background: transparent;
+  border: 1px solid currentColor;
+  border-radius: 9999px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: inherit;
+  cursor: pointer;
+  outline: none;
+}
+
+.gtranslate_wrapper select option {
+  color: #1a1a1a;
+  background: #fff;
+}
+
+/* Selector más compacto en móvil */
+@media (max-width: 767px) {
+  .gtranslate_wrapper select {
+    padding: 6px 10px;
+    font-size: 12px;
+    max-width: 110px;
+  }
+}
