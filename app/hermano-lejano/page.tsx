@@ -430,7 +430,7 @@ export default function HermanoLejanoPage() {
               rel="noopener noreferrer"
               className="bg-sun text-brand-blue-deep px-7 py-4 rounded-full text-sm font-semibold inline-flex items-center gap-2 hover:bg-sun-soft transition-colors"
             >
-              <span>WhatsApp Carlos - 7730-3994</span>
+              <span>WhatsApp Carlos - 7396-3858</span>
               <ArrowUpRight size={14} />
             </a>
           </div>

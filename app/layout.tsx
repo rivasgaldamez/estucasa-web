@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import Script from "next/script";
 import {
   getOrganizationSchema,
   getWebsiteSchema,
@@ -103,6 +104,20 @@ export default function RootLayout({
         <ScrollToTop />
         <GoogleTranslate />
         <GoogleAnalytics gaId="G-MBVDNPVR62" />
+
+        {/* Google Ads (etiqueta de conversión) */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=AW-608784098"
+          strategy="afterInteractive"
+        />
+        <Script id="google-ads" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'AW-608784098');
+          `}
+        </Script>
       </body>
     </html>
   );

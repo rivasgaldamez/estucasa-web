@@ -10,6 +10,7 @@ import {
   X,
   type LucideIcon,
 } from "lucide-react";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 type NavbarProps = {
   variant?: "light" | "dark";
@@ -48,7 +49,6 @@ export default function Navbar({ variant = "light" }: NavbarProps) {
     };
   }, []);
 
-  // Bloquear scroll del body cuando el menú móvil está abierto
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
 
@@ -115,9 +115,9 @@ export default function Navbar({ variant = "light" }: NavbarProps) {
             })}
           </div>
 
-          {/* ACCIONES DERECHA: IDIOMA + WHATSAPP DESKTOP + HAMBURGUESA MÓVIL */}
+          {/* ACCIONES DERECHA */}
           <div className="flex items-center gap-2 md:gap-3">
-            <div className="gtranslate_wrapper" />
+            <LanguageSwitcher />
 
             <a
               href="https://wa.me/50379889533"
@@ -126,7 +126,7 @@ export default function Navbar({ variant = "light" }: NavbarProps) {
               className="hidden md:inline-flex bg-brand-blue text-cream px-6 py-3.5 rounded-full text-sm font-medium items-center gap-2 border border-brand-blue hover:bg-brand-blue-deep transition-colors"
               aria-label="Escribir por WhatsApp"
             >
-              <span>WhatsApp</span>
+              <span>WhatsApp </span>
               <ArrowUpRight size={14} />
             </a>
 

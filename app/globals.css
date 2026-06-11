@@ -100,8 +100,8 @@ body {
   transform: translateY(0);
 }
 
-/* ===== Selector de idiomas GTranslate ===== */
-.gtranslate_wrapper select {
+/* ===== Selector de idiomas ===== */
+.lang-select {
   background: transparent;
   border: 1px solid currentColor;
   border-radius: 9999px;
@@ -113,14 +113,14 @@ body {
   outline: none;
 }
 
-.gtranslate_wrapper select option {
+.lang-select option {
   color: #1a1a1a;
   background: #fff;
 }
 
 /* Selector más compacto en móvil */
 @media (max-width: 767px) {
-  .gtranslate_wrapper select {
+  .lang-select {
     padding: 6px 10px;
     font-size: 12px;
     max-width: 110px;
