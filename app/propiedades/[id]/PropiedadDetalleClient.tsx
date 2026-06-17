@@ -37,11 +37,42 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
   const precio = Number(propiedad?.precio) || 0;
   const areaConstruccion = Number(propiedad?.areaConstruccion) || 0;
 
+  // Procesa la galería para ser compatible con formato viejo y nuevo
+  const processedGallery = useMemo(() => {
+    const gallery = propiedad?.galeria || [];
+
+    return gallery
+      .map((item: any) => {
+        // Formato viejo: item es directamente una imagen
+        if (item && item.asset) {
+          return { image: item, label: null };
+        }
+
+        // Formato nuevo: item es un objeto { image, label }
+        if (item && item.image && item.image.asset) {
+          return { image: item.image, label: item.label || null };
+        }
+
+        return null;
+      })
+      .filter((item: any) => item !== null);
+  }, [propiedad?.galeria]);
+
   const allImages = useMemo(() => {
-    return [propiedad?.fotoPortada, ...(propiedad?.galeria || [])].filter(
-      (img: any) => img && img.asset
+    return [{ image: propiedad?.fotoPortada, label: null }, ...processedGallery].filter(
+      (item: any) => item.image && item.image.asset
     );
-  }, [propiedad?.fotoPortada, propiedad?.galeria]);
+  }, [propiedad?.fotoPortada, processedGallery]);
+
+  // Extrae las etiquetas que existan
+  const areasWithLabels = useMemo(() => {
+    return allImages
+      .map((item: any, index: number) => ({
+        index,
+        label: item.label,
+      }))
+      .filter((item: any) => item.label);
+  }, [allImages]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -216,9 +247,29 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
       {allImages.length > 0 ? (
         <section className="px-6 md:px-12 pb-12">
           <div className="max-w-[1440px] mx-auto">
+            {/* BOTONES DE ÁREAS, SI HAY ETIQUETAS */}
+            {areasWithLabels.length > 0 ? (
+              <div className="mb-4 flex flex-wrap gap-2">
+                {areasWithLabels.map((area: any) => (
+                  <button
+                    key={area.index}
+                    type="button"
+                    onClick={() => setActiveImage(area.index)}
+                    className={
+                      area.index === activeImage
+                        ? "px-4 py-2 rounded-full text-sm font-medium bg-brand-blue text-cream transition-colors"
+                        : "px-4 py-2 rounded-full text-sm font-medium bg-cream-warm text-ink border border-black/10 hover:bg-brand-blue hover:text-cream hover:border-brand-blue transition-colors"
+                    }
+                  >
+                    {area.label}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+
             <div className="relative aspect-[16/9] rounded-3xl overflow-hidden bg-stone">
               <img
-                src={getImageUrl(allImages[activeImage], 1600, 900)}
+                src={getImageUrl(allImages[activeImage]?.image, 1600, 900)}
                 alt={titulo}
                 className="w-full h-full object-cover cursor-zoom-in"
                 onClick={() => setLightboxOpen(true)}
@@ -261,7 +312,7 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
 
             {allImages.length > 1 ? (
               <div className="flex gap-2 mt-3 overflow-x-auto pb-2">
-                {allImages.map((img: any, index: number) => (
+                {allImages.map((item: any, index: number) => (
                   <button
                     key={index}
                     type="button"
@@ -274,7 +325,7 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
                     }
                   >
                     <img
-                      src={getImageUrl(img, 200, 150)}
+                      src={getImageUrl(item.image, 200, 150)}
                       alt={`Vista ${index + 1}`}
                       className="w-full h-full object-cover"
                     />
@@ -387,6 +438,7 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
             {propiedad?.amenidades && propiedad.amenidades.length > 0 ? (
               <div className="reveal mb-10">
                 <div className="eyebrow text-sun mb-4">Amenidades</div>
+
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {propiedad.amenidades.map(
                     (amenidad: string, index: number) => (
@@ -406,6 +458,7 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
             {propiedad?.videoYoutube ? (
               <div className="reveal mb-10">
                 <div className="eyebrow text-sun mb-3">Video tour</div>
+
                 <div className="aspect-video rounded-2xl overflow-hidden bg-ink">
                   <iframe
                     src={getYoutubeEmbedUrl(propiedad.videoYoutube)}
@@ -532,7 +585,7 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
 
           <div className="flex-1 flex items-center justify-center px-4 pb-4 relative">
             <img
-              src={getImageUrl(allImages[activeImage], 1600, 1200)}
+              src={getImageUrl(allImages[activeImage]?.image, 1600, 1200)}
               alt={titulo}
               className="max-w-full max-h-full object-contain rounded-2xl"
             />
@@ -567,7 +620,7 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
               </div>
 
               <div className="flex gap-2 justify-center overflow-x-auto pb-2">
-                {allImages.map((img: any, index: number) => (
+                {allImages.map((item: any, index: number) => (
                   <button
                     key={index}
                     type="button"
@@ -580,7 +633,7 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
                     }
                   >
                     <img
-                      src={getImageUrl(img, 200, 150)}
+                      src={getImageUrl(item.image, 200, 150)}
                       alt={`Vista ${index + 1}`}
                       className="w-full h-full object-cover"
                     />
