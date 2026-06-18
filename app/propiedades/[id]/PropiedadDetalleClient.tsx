@@ -37,34 +37,35 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
   const precio = Number(propiedad?.precio) || 0;
   const areaConstruccion = Number(propiedad?.areaConstruccion) || 0;
 
-  // Procesa la galería para ser compatible con formato viejo y nuevo
   const processedGallery = useMemo(() => {
     const gallery = propiedad?.galeria || [];
 
     return gallery
       .map((item: any) => {
-        // Formato viejo: item es directamente una imagen
-        if (item && item.asset) {
+        // Formato viejo: imagen directa
+        if (item?.asset) {
           return { image: item, label: null };
         }
 
-        // Formato nuevo: item es un objeto { image, label }
-        if (item && item.image && item.image.asset) {
-          return { image: item.image, label: item.label || null };
+        // Formato nuevo: objeto con imagen + etiqueta
+        if (item?.image?.asset) {
+          return {
+            image: item.image,
+            label: item.label || null,
+          };
         }
 
         return null;
       })
-      .filter((item: any) => item !== null);
+      .filter(Boolean);
   }, [propiedad?.galeria]);
 
   const allImages = useMemo(() => {
     return [{ image: propiedad?.fotoPortada, label: null }, ...processedGallery].filter(
-      (item: any) => item.image && item.image.asset
+      (item: any) => item?.image?.asset
     );
   }, [propiedad?.fotoPortada, processedGallery]);
 
-  // Extrae las etiquetas que existan
   const areasWithLabels = useMemo(() => {
     return allImages
       .map((item: any, index: number) => ({
@@ -89,7 +90,6 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
     return () => observer.disconnect();
   }, []);
 
-  // Bloquear scroll del body cuando el lightbox está abierto
   useEffect(() => {
     document.body.style.overflow = lightboxOpen ? "hidden" : "";
 
@@ -98,7 +98,6 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
     };
   }, [lightboxOpen]);
 
-  // Evita que activeImage quede fuera de rango si cambia la galería
   useEffect(() => {
     if (activeImage >= allImages.length) {
       setActiveImage(0);
@@ -106,7 +105,7 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
   }, [activeImage, allImages.length]);
 
   const getImageUrl = (image: any, width = 1600, height = 900) => {
-    if (!image || !image.asset) return "";
+    if (!image?.asset) return "";
 
     try {
       return urlFor(image).width(width).height(height).url();
@@ -140,7 +139,9 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
     `Hola, me interesa la propiedad ${codigo}: "${titulo}". Quisiera más información.`
   );
 
-  const telefonoAsesor = propiedad?.asesor?.telefono || "50379889533";
+  const telefonoAsesorRaw = propiedad?.asesor?.telefono || "50379889533";
+  const telefonoAsesor = String(telefonoAsesorRaw).replace(/\D/g, "");
+
   const nombreAsesor = propiedad?.asesor?.nombre || "Mario Rivas";
   const displayAsesor = propiedad?.asesor?.telefonoDisplay || "7988-9533";
   const cargoAsesor = propiedad?.asesor?.cargo || "Asesor Inmobiliario";
@@ -156,7 +157,6 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
     setActiveImage((prev) => (prev - 1 + allImages.length) % allImages.length);
   };
 
-  // Detecta si la descripción larga es Portable Text o texto simple
   const descripcionEsPortableText = Array.isArray(propiedad?.descripcionLarga);
 
   return (
@@ -247,29 +247,9 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
       {allImages.length > 0 ? (
         <section className="px-6 md:px-12 pb-12">
           <div className="max-w-[1440px] mx-auto">
-            {/* BOTONES DE ÁREAS, SI HAY ETIQUETAS */}
-            {areasWithLabels.length > 0 ? (
-              <div className="mb-4 flex flex-wrap gap-2">
-                {areasWithLabels.map((area: any) => (
-                  <button
-                    key={area.index}
-                    type="button"
-                    onClick={() => setActiveImage(area.index)}
-                    className={
-                      area.index === activeImage
-                        ? "px-4 py-2 rounded-full text-sm font-medium bg-brand-blue text-cream transition-colors"
-                        : "px-4 py-2 rounded-full text-sm font-medium bg-cream-warm text-ink border border-black/10 hover:bg-brand-blue hover:text-cream hover:border-brand-blue transition-colors"
-                    }
-                  >
-                    {area.label}
-                  </button>
-                ))}
-              </div>
-            ) : null}
-
             <div className="relative aspect-[16/9] rounded-3xl overflow-hidden bg-stone">
               <img
-                src={getImageUrl(allImages[activeImage]?.image, 1600, 900)}
+                src={getImageUrl(allImages[activeImage].image, 1600, 900)}
                 alt={titulo}
                 className="w-full h-full object-cover cursor-zoom-in"
                 onClick={() => setLightboxOpen(true)}
@@ -311,7 +291,7 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
             </div>
 
             {allImages.length > 1 ? (
-              <div className="flex gap-2 mt-3 overflow-x-auto pb-2">
+              <div className="flex gap-2 mt-3 overflow-x-auto pb-2 mb-6">
                 {allImages.map((item: any, index: number) => (
                   <button
                     key={index}
@@ -331,6 +311,32 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
                     />
                   </button>
                 ))}
+              </div>
+            ) : null}
+
+            {/* BOTONES DE ÁREAS */}
+            {areasWithLabels.length > 0 ? (
+              <div className="mb-10">
+                <div className="eyebrow text-sun mb-3">
+                  Explora los espacios
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  {areasWithLabels.map((area: any) => (
+                    <button
+                      key={area.index}
+                      type="button"
+                      onClick={() => setActiveImage(area.index)}
+                      className={
+                        area.index === activeImage
+                          ? "px-5 py-2.5 rounded-full text-sm font-medium bg-brand-blue text-cream transition-colors"
+                          : "px-5 py-2.5 rounded-full text-sm font-medium bg-cream-warm text-ink border border-black/10 hover:bg-brand-blue hover:text-cream hover:border-brand-blue transition-colors"
+                      }
+                    >
+                      {area.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             ) : null}
           </div>
@@ -396,9 +402,7 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
                   <div className="display text-2xl">
                     {propiedad.anoConstruccion}
                   </div>
-                  <div className="text-xs text-ink-soft">
-                    Año construcción
-                  </div>
+                  <div className="text-xs text-ink-soft">Año construcción</div>
                 </div>
               ) : null}
 
@@ -438,7 +442,6 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
             {propiedad?.amenidades && propiedad.amenidades.length > 0 ? (
               <div className="reveal mb-10">
                 <div className="eyebrow text-sun mb-4">Amenidades</div>
-
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {propiedad.amenidades.map(
                     (amenidad: string, index: number) => (
@@ -458,7 +461,6 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
             {propiedad?.videoYoutube ? (
               <div className="reveal mb-10">
                 <div className="eyebrow text-sun mb-3">Video tour</div>
-
                 <div className="aspect-video rounded-2xl overflow-hidden bg-ink">
                   <iframe
                     src={getYoutubeEmbedUrl(propiedad.videoYoutube)}
@@ -477,7 +479,7 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
               <div className="eyebrow text-sun mb-4">Asesor asignado</div>
 
               <div className="flex items-center gap-4 mb-6 pb-6 border-b border-black/10">
-                {propiedad?.asesor?.foto && propiedad.asesor.foto.asset ? (
+                {propiedad?.asesor?.foto?.asset ? (
                   <img
                     src={getImageUrl(propiedad.asesor.foto, 120, 120)}
                     alt={nombreAsesor}
@@ -585,7 +587,7 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
 
           <div className="flex-1 flex items-center justify-center px-4 pb-4 relative">
             <img
-              src={getImageUrl(allImages[activeImage]?.image, 1600, 1200)}
+              src={getImageUrl(allImages[activeImage].image, 1600, 1200)}
               alt={titulo}
               className="max-w-full max-h-full object-contain rounded-2xl"
             />
