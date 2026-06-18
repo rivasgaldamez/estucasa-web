@@ -314,11 +314,12 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
               </div>
             ) : null}
 
-            {/* BOTONES DE ÁREAS */}
+           {/* BOTONES DE ÁREAS (si hay etiquetas) */}
             {areasWithLabels.length > 0 ? (
               <div className="mb-10">
-                <div className="eyebrow text-sun mb-3">
-                  Explora los espacios
+                <div className="eyebrow text-sun mb-3 flex items-center gap-2">
+                  <span>Explora los espacios</span>
+                  <span className="text-base animate-bounce">👆</span>
                 </div>
 
                 <div className="flex flex-wrap gap-2">
