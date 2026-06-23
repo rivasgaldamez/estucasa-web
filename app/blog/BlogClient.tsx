@@ -14,6 +14,7 @@ import {
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import WhatsAppLink from "@/components/WhatsAppLink";
 import Torogoz from "@/components/Torogoz";
 import { urlFor } from "@/lib/sanity";
 
@@ -450,16 +451,14 @@ export default function BlogClient({ articulos, categorias }: Props) {
                 El Salvador con una estrategia clara y acompanamiento real.
               </p>
 
-              <a
+              <WhatsAppLink
                 href="https://wa.me/50379889533"
-                target="_blank"
-                rel="noopener noreferrer"
                 className="bg-sun text-brand-blue-deep px-7 py-4 rounded-full text-sm font-semibold inline-flex items-center gap-2 hover:bg-sun-soft transition-colors"
               >
                 <span>Hablar por WhatsApp</span>
 
                 <ArrowUpRight size={14} />
-              </a>
+              </WhatsAppLink>
             </div>
           </div>
         </div>

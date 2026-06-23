@@ -14,6 +14,7 @@ import {
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import WhatsAppLink from "@/components/WhatsAppLink";
 import Torogoz from "@/components/Torogoz";
 import { getCategorias } from "@/lib/faqs";
 
@@ -280,25 +281,21 @@ export default function PreguntasFrecuentesClient({ faqs }: Props) {
               </p>
 
               <div className="flex gap-3 justify-center flex-wrap">
-                <a
+                <WhatsAppLink
                   href="https://wa.me/50379889533?text=Hola%20Mario%2C%20tengo%20una%20pregunta%20sobre%20su%20servicio."
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="bg-sun text-brand-blue-deep px-7 py-4 rounded-full text-sm font-semibold inline-flex items-center gap-2 hover:bg-sun-soft transition-colors"
                 >
                   <span>WhatsApp Mario - 7988-9533</span>
                   <ArrowUpRight size={14} />
-                </a>
+                </WhatsAppLink>
 
-                <a
+                <WhatsAppLink
                   href="https://wa.me/50377303994?text=Hola%20Carlos%2C%20tengo%20una%20pregunta%20sobre%20su%20servicio."
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="px-7 py-4 rounded-full text-sm font-medium inline-flex items-center gap-2 border border-white/25 text-cream hover:border-sun hover:text-sun transition-colors"
                 >
                   <span>WhatsApp Carlos - 7396-3858</span>
                   <ArrowUpRight size={14} />
-                </a>
+                </WhatsAppLink>
               </div>
             </div>
           </div>

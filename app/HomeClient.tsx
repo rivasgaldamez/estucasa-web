@@ -8,6 +8,7 @@ import Sun from "@/components/Sun";
 import Torogoz from "@/components/Torogoz";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import WhatsAppLink from "@/components/WhatsAppLink";
 import Siguenos from "@/components/Siguenos";
 import { urlFor } from "@/lib/sanity";
 
@@ -448,25 +449,21 @@ export default function HomeClient({ destacadas }: Props) {
           </p>
 
           <div className="flex gap-3 justify-center flex-wrap">
-            <a
+            <WhatsAppLink
               href="https://wa.me/50379889533"
-              target="_blank"
-              rel="noopener noreferrer"
               className="bg-brand-blue text-cream px-7 py-4 rounded-full text-sm font-medium inline-flex items-center gap-2 hover:bg-brand-blue-deep transition-colors"
             >
               <span>WhatsApp Mario - 7988-9533</span>
               <ArrowUpRight size={14} />
-            </a>
+            </WhatsAppLink>
 
-            <a
+            <WhatsAppLink
               href="https://wa.me/50377303994"
-              target="_blank"
-              rel="noopener noreferrer"
               className="bg-sun text-brand-blue-deep px-7 py-4 rounded-full text-sm font-semibold inline-flex items-center gap-2 hover:bg-sun-soft transition-colors"
             >
               <span>WhatsApp Carlos - 7396-3858</span>
               <ArrowUpRight size={14} />
-            </a>
+            </WhatsAppLink>
           </div>
         </div>
       </section>
