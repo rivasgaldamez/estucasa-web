@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import WhatsAppLink from "@/components/WhatsAppLink";
 import { urlFor } from "@/lib/sanity";
 
 type Props = {
@@ -385,7 +386,7 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
                   <div className="display text-2xl">
                     {propiedad.areaTerreno}
                   </div>
-                  <div className="text-xs text-ink-soft">m² terreno</div>
+                  <div className="text-xs text-ink-soft">v² terreno</div>
                 </div>
               ) : null}
 
@@ -513,15 +514,13 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
               </div>
 
               <div className="space-y-3">
-                <a
+                <WhatsAppLink
                   href={`https://wa.me/${telefonoAsesor}?text=${whatsappMsg}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="w-full bg-brand-blue text-cream px-6 py-4 rounded-full text-sm font-medium inline-flex items-center justify-center gap-2 hover:bg-brand-blue-deep transition-colors"
                 >
                   <span>Escribir por WhatsApp</span>
                   <ArrowUpRight size={14} />
-                </a>
+                </WhatsAppLink>
 
                 <a
                   href={`mailto:${emailAsesor}`}
@@ -557,17 +556,15 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
               prefieras. Atención personalizada sin presión comercial.
             </p>
 
-            <a
+            <WhatsAppLink
               href={`https://wa.me/${telefonoAsesor}?text=${whatsappMsg}`}
-              target="_blank"
-              rel="noopener noreferrer"
               className="bg-sun text-brand-blue-deep px-7 py-4 rounded-full text-sm font-semibold inline-flex items-center gap-2 hover:bg-sun-soft transition-colors"
             >
               <span>
                 WhatsApp {nombreAsesor.split(" ")[0]} - {displayAsesor}
               </span>
               <ArrowUpRight size={14} />
-            </a>
+            </WhatsAppLink>
           </div>
         </div>
       </section>
