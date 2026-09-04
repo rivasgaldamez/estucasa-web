@@ -1,5 +1,4 @@
 import type { NextConfig } from "next";
-
 const nextConfig: NextConfig = {
   async redirects() {
     return [
@@ -10,14 +9,12 @@ const nextConfig: NextConfig = {
         destination: "/propiedades",
         permanent: true,
       },
-
       // ===== ARCHIVOS .html DEL SITIO ANTIGUO =====
       {
         source: "/casas-caras.html",
         destination: "/propiedades",
         permanent: true,
       },
-
       // ===== ARTÍCULOS DE BLOG VIEJOS (coincidencia exacta) =====
       // Redirigen al blog general.
       {
@@ -43,8 +40,28 @@ const nextConfig: NextConfig = {
         destination: "/blog",
         permanent: true,
       },
+      // ===== ARTÍCULOS REESCRITOS (recuperados del sitio viejo) =====
+      {
+        source:
+          "/que-pasos-debo-seguir-para-poner-una-propiedad-en-alquiler",
+        destination:
+          "/blog/pasos-para-poner-una-propiedad-en-alquiler-en-el-salvador",
+        permanent: true,
+      },
+      {
+        source:
+          "/que-impuestos-y-gastos-adicionales-debo-considerar-al-comprar-una-propiedad-en-el-salvador",
+        destination:
+          "/blog/impuestos-y-gastos-al-comprar-una-propiedad-en-el-salvador",
+        permanent: true,
+      },
+      // ===== PÁGINA "NOSOTROS" ANTIGUA =====
+      {
+        source: "/about",
+        destination: "/asesores",
+        permanent: true,
+      },
     ];
   },
 };
-
 export default nextConfig;
