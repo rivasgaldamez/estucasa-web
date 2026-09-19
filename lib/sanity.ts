@@ -12,6 +12,8 @@ export const sanityClient = createClient({
 // Helper para generar URLs de imagenes
 const builder = imageUrlBuilder(sanityClient);
 
+// Por defecto: formato moderno automatico (WebP/AVIF) y calidad 75.
+// Se puede seguir encadenando .width(), .height(), etc. como antes.
 export function urlFor(source: unknown) {
-  return builder.image(source as never);
+  return builder.image(source as never).auto("format").quality(75);
 }

@@ -304,6 +304,10 @@ export default function HomeClient({ destacadas }: Props) {
                     <img
                       src={getImageUrl(principal.fotoPortada, 1200, 900)}
                       alt={principal.titulo}
+                      width={1200}
+                      height={900}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover transition-transform duration-[1.2s] group-hover:scale-105"
                     />
                   ) : null}
@@ -353,6 +357,10 @@ export default function HomeClient({ destacadas }: Props) {
                       <img
                         src={getImageUrl(secundarias[0].fotoPortada, 800, 600)}
                         alt={secundarias[0].titulo}
+                        width={800}
+                        height={600}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover transition-transform duration-[1.2s] group-hover:scale-105"
                       />
                     ) : null}
@@ -392,6 +400,10 @@ export default function HomeClient({ destacadas }: Props) {
                         <img
                           src={getImageUrl(property.fotoPortada, 600, 450)}
                           alt={property.titulo}
+                          width={600}
+                          height={450}
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-full object-cover transition-transform duration-[1.2s] group-hover:scale-105"
                         />
                       ) : null}
