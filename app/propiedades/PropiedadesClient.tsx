@@ -200,7 +200,7 @@ export default function PropiedadesClient({ propiedades }: Props) {
             </div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filtered.map((propiedad) => (
+              {filtered.map((propiedad, index) => (
                 <Link
                   key={propiedad._id}
                   href={`/propiedades/${propiedad.codigo}`}
@@ -211,6 +211,10 @@ export default function PropiedadesClient({ propiedades }: Props) {
                       <img
                         src={getImageUrl(propiedad.fotoPortada, 800, 600)}
                         alt={propiedad.titulo}
+                        width={800}
+                        height={600}
+                        loading={index < 3 ? "eager" : "lazy"}
+                        decoding="async"
                         className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                       />
                     ) : null}
