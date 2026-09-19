@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { Instrument_Serif, Figtree } from "next/font/google";
 import Script from "next/script";
 import {
   getOrganizationSchema,
@@ -10,6 +11,21 @@ import ScrollToTop from "@/components/ScrollToTop";
 import GoogleTranslate from "@/components/GoogleTranslate";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
+
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+  display: "swap",
+  variable: "--font-instrument",
+});
+
+const figtree = Figtree({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-figtree",
+});
 
 export const metadata: Metadata = {
   title: {
@@ -86,7 +102,10 @@ export default function RootLayout({
   const websiteSchema = getWebsiteSchema();
 
   return (
-    <html lang="es-SV">
+    <html
+      lang="es-SV"
+      className={`${instrumentSerif.variable} ${figtree.variable}`}
+    >
       <head>
         <script
           type="application/ld+json"

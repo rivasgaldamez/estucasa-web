@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Figtree:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -16,9 +15,9 @@
   --color-sun-soft: #FFD060;
   --color-stone: #E0D7C4;
 
-  /* Fuentes */
-  --font-serif: 'Instrument Serif', serif;
-  --font-sans: 'Figtree', sans-serif;
+  /* Fuentes (cargadas con next/font en layout.tsx) */
+  --font-serif: var(--font-instrument), 'Instrument Serif', serif;
+  --font-sans: var(--font-figtree), 'Figtree', sans-serif;
 }
 
 body {
