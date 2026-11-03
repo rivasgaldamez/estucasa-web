@@ -1,11 +1,28 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Quita la cabecera "X-Powered-By: Next.js"
+  poweredByHeader: false,
+
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
       { protocol: "https", hostname: "cdn.sanity.io" },
     ],
+  },
+
+  // Cabeceras de seguridad para todo el sitio
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+        ],
+      },
+    ];
   },
 
   async redirects() {

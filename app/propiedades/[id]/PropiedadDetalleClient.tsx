@@ -265,6 +265,17 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
             <div className="relative aspect-[16/9] rounded-3xl overflow-hidden bg-stone">
               <img
                 src={getImageUrl(allImages[activeImage].image, 1600, 900)}
+                srcSet={[640, 1024, 1600]
+                  .map(
+                    (w) =>
+                      `${getImageUrl(
+                        allImages[activeImage].image,
+                        w,
+                        Math.round((w * 9) / 16)
+                      )} ${w}w`
+                  )
+                  .join(", ")}
+                sizes="(min-width: 1536px) 1440px, 100vw"
                 alt={titulo}
                 width={1600}
                 height={900}
