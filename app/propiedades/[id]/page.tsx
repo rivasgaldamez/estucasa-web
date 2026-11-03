@@ -12,6 +12,20 @@ import PropiedadDetalleClient from "./PropiedadDetalleClient";
 // Las fichas se refrescan solas cada 10 minutos (cambios y borrados en Sanity)
 export const revalidate = 600;
 
+// Las fichas existentes se generan al publicar el sitio y quedan en caché.
+// Una propiedad nueva se genera en su primera visita.
+export async function generateStaticParams() {
+  try {
+    const codigos = await sanityClient.fetch<string[]>(
+      `*[_type == "propiedad" && defined(codigo)].codigo`
+    );
+
+    return codigos.map((id) => ({ id }));
+  } catch {
+    return [];
+  }
+}
+
 type Props = {
   params: Promise<{
     id: string;

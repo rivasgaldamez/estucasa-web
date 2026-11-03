@@ -1,6 +1,9 @@
 import type { MetadataRoute } from "next";
 import { createClient } from "next-sanity";
 
+// El sitemap se regenera solo cada 10 minutos
+export const revalidate = 600;
+
 const SITE_URL = "https://estucasasv.com";
 
 type PropiedadSitemap = {
@@ -32,9 +35,21 @@ function getValidDate(date?: string) {
   return parsedDate;
 }
 
+// Fecha más reciente de una lista (o undefined si no hay ninguna válida)
+function getLatestDate(dates: Array<string | undefined>) {
+  const valid = dates
+    .map((date) => (date ? new Date(date) : null))
+    .filter((date): date is Date => date !== null && !Number.isNaN(date.getTime()));
+
+  if (valid.length === 0) return undefined;
+
+  return new Date(Math.max(...valid.map((date) => date.getTime())));
+}
+
 async function getPropiedades(): Promise<PropiedadSitemap[]> {
   try {
-    const query = `*[_type == "propiedad" && defined(codigo)]{
+    // Las propiedades vendidas no se listan en el sitemap
+    const query = `*[_type == "propiedad" && defined(codigo) && estado != "vendida"]{
       codigo,
       _updatedAt
     }`;
@@ -59,54 +74,54 @@ async function getArticulos(): Promise<ArticuloSitemap[]> {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const now = new Date();
+  const [propiedades, articulos] = await Promise.all([
+    getPropiedades(),
+    getArticulos(),
+  ]);
 
+  const ultimaPropiedad = getLatestDate(propiedades.map((p) => p._updatedAt));
+  const ultimoArticulo = getLatestDate(articulos.map((a) => a._updatedAt));
+
+  // Las páginas fijas llevan fecha solo cuando hay una fecha real detrás
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: SITE_URL,
-      lastModified: now,
       changeFrequency: "weekly",
       priority: 1,
     },
     {
       url: `${SITE_URL}/propiedades`,
-      lastModified: now,
+      lastModified: ultimaPropiedad,
       changeFrequency: "daily",
       priority: 0.9,
     },
     {
       url: `${SITE_URL}/hermano-lejano`,
-      lastModified: now,
       changeFrequency: "monthly",
       priority: 0.8,
     },
     {
       url: `${SITE_URL}/vender`,
-      lastModified: now,
       changeFrequency: "monthly",
       priority: 0.8,
     },
     {
       url: `${SITE_URL}/blog`,
-      lastModified: now,
+      lastModified: ultimoArticulo,
       changeFrequency: "weekly",
       priority: 0.7,
     },
     {
       url: `${SITE_URL}/preguntas-frecuentes`,
-      lastModified: now,
       changeFrequency: "monthly",
       priority: 0.7,
     },
     {
       url: `${SITE_URL}/asesores`,
-      lastModified: now,
       changeFrequency: "monthly",
       priority: 0.6,
     },
   ];
-
-  const propiedades = await getPropiedades();
 
   const propiedadPages: MetadataRoute.Sitemap = propiedades.map((propiedad) => ({
     url: `${SITE_URL}/propiedades/${propiedad.codigo}`,
@@ -114,8 +129,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: "weekly",
     priority: 0.8,
   }));
-
-  const articulos = await getArticulos();
 
   const articuloPages: MetadataRoute.Sitemap = articulos.map((articulo) => ({
     url: `${SITE_URL}/blog/${articulo.slug}`,
