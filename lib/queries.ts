@@ -36,6 +36,8 @@ export const queryPropiedadPorCodigo = `*[
   && codigo == $codigo
 ][0] {
   _id,
+  _createdAt,
+  _updatedAt,
   codigo,
   titulo,
   "slug": slug.current,
@@ -50,6 +52,7 @@ export const queryPropiedadPorCodigo = `*[
   banosVisita,
   areaConstruccion,
   areaTerreno,
+  unidadTerreno,
   niveles,
   parqueos,
   anoConstruccion,

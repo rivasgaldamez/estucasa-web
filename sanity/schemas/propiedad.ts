@@ -153,10 +153,29 @@ export default defineType({
 
     defineField({
       name: "areaTerreno",
-      title: "Area de terreno (m2 o v2)",
+      title: "Area de terreno",
+      description:
+        "Solo el numero, tal como dice la escritura. La unidad se elige en el campo de abajo.",
       type: "number",
       group: "detalles",
       validation: (Rule) => Rule.min(0),
+    }),
+
+    defineField({
+      name: "unidadTerreno",
+      title: "Unidad del terreno",
+      description:
+        "En que unidad esta el numero de arriba. Si lo dejas vacio, el sitio muestra varas cuadradas (v2).",
+      type: "string",
+      group: "detalles",
+      options: {
+        list: [
+          { title: "Varas cuadradas (v2)", value: "v2" },
+          { title: "Metros cuadrados (m2)", value: "m2" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "v2",
     }),
 
     defineField({

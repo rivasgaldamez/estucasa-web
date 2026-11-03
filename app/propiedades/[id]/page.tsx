@@ -9,6 +9,9 @@ import {
 } from "@/lib/schema";
 import PropiedadDetalleClient from "./PropiedadDetalleClient";
 
+// Las fichas se refrescan solas cada 10 minutos (cambios y borrados en Sanity)
+export const revalidate = 600;
+
 type Props = {
   params: Promise<{
     id: string;
@@ -21,6 +24,8 @@ type SanityImage = {
 
 type Propiedad = {
   _id: string;
+  _createdAt?: string;
+  _updatedAt?: string;
   codigo: string;
   titulo: string;
   slug?: string;
@@ -34,6 +39,7 @@ type Propiedad = {
   banosCompletos?: number;
   areaConstruccion?: number;
   areaTerreno?: number;
+  unidadTerreno?: string;
   parqueos?: number;
   zona?: {
     nombre?: string;
@@ -140,16 +146,21 @@ export default async function PropiedadDetallePage({ params }: Props) {
     descripcion: propiedad.descripcionCorta || propiedad.titulo,
     precio: propiedad.precio,
     tipo: propiedad.tipo,
+    operacion: propiedad.operacion,
+    estado: propiedad.estado,
     habitaciones: propiedad.habitaciones,
     banosCompletos: propiedad.banosCompletos,
     areaConstruccion: propiedad.areaConstruccion,
     areaTerreno: propiedad.areaTerreno,
+    unidadTerreno: propiedad.unidadTerreno,
     parqueos: propiedad.parqueos,
     zonaNombre: propiedad.zona?.nombre,
     zonaMunicipio: propiedad.zona?.municipio,
     fotoPortadaUrl,
     asesorNombre: propiedad.asesor?.nombre,
     asesorSlug: propiedad.asesor?.slug,
+    fechaCreacion: propiedad._createdAt,
+    fechaModificacion: propiedad._updatedAt,
   });
 
   const breadcrumbSchema = getBreadcrumbSchema([

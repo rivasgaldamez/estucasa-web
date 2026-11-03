@@ -4,6 +4,9 @@
 const SITE_URL = "https://estucasasv.com";
 const SITE_NAME = "ES Tu Casa Inmobiliaria";
 
+// Correo público del sitio. Para cambiarlo en todo el schema, edita SOLO esta línea.
+const CONTACT_EMAIL = "estucasasv@gmail.com";
+
 function normalizePhone(phone?: string) {
   if (!phone) return undefined;
 
@@ -34,20 +37,22 @@ export function getOrganizationSchema() {
       "Inmobiliaria salvadoreña especializada en compra, venta e inversión inmobiliaria. Atención personalizada para clientes locales y diáspora salvadoreña en el extranjero.",
     slogan: "El Salvador ES Tu Casa.",
     foundingDate: "2019",
+    telephone: "+50379889533",
+    email: CONTACT_EMAIL,
     founder: [
       {
         "@type": "Person",
         name: "Mario Rivas",
         jobTitle: "Socio Fundador - Asesor Inmobiliario",
         telephone: "+50379889533",
-        email: "info@estucasasv.com",
+        email: CONTACT_EMAIL,
       },
       {
         "@type": "Person",
         name: "Carlos Díaz",
         jobTitle: "Socio Fundador - Asesor Comercial",
         telephone: "+50373963858",
-        email: "info@estucasasv.com",
+        email: CONTACT_EMAIL,
       },
     ],
     address: {
@@ -119,7 +124,7 @@ export function getPersonSchema(asesor: AsesorSchema) {
     jobTitle: asesor.cargo || "Asesor Inmobiliario",
     description: asesor.bio || undefined,
     telephone: normalizePhone(asesor.telefono),
-    email: asesor.email || "info@estucasasv.com",
+    email: asesor.email || CONTACT_EMAIL,
     image: asesor.fotoUrl || undefined,
     worksFor: {
       "@id": `${SITE_URL}/#organization`,
@@ -186,86 +191,88 @@ type PropiedadSchema = {
   descripcion?: string;
   precio: number;
   tipo: string;
+  operacion?: string;
+  estado?: string;
   habitaciones?: number;
   banosCompletos?: number;
   areaConstruccion?: number;
   areaTerreno?: number;
+  // "m2" o "v2". Si viene vacío se asume varas cuadradas, igual que la ficha.
+  unidadTerreno?: string;
   parqueos?: number;
   zonaNombre?: string;
   zonaMunicipio?: string;
   fotoPortadaUrl?: string;
   asesorNombre?: string;
   asesorSlug?: string;
+  fechaCreacion?: string;
+  fechaModificacion?: string;
 };
 
 function getPropertySchemaType(tipo: string) {
   if (tipo === "apartamento") return "Apartment";
-  if (tipo === "terreno") return "Landform";
-  if (tipo === "comercial") return "CommercialProperty";
+  // Terrenos y locales comerciales: Place es el tipo genérico y siempre válido.
+  if (tipo === "terreno" || tipo === "comercial") return "Place";
 
   return "SingleFamilyResidence";
 }
 
+function getAvailability(estado?: string) {
+  if (estado === "vendida") return "https://schema.org/SoldOut";
+  if (estado === "reservada") return "https://schema.org/Reserved";
+  if (estado === "pausada") return "https://schema.org/OutOfStock";
+
+  return "https://schema.org/InStock";
+}
+
 export function getRealEstateListingSchema(prop: PropiedadSchema) {
-  const schema: Record<string, unknown> = {
-    "@context": "https://schema.org",
+  const url = `${SITE_URL}/propiedades/${prop.codigo}`;
+  const tieneHabitaciones =
+    prop.tipo !== "terreno" && prop.tipo !== "comercial";
+
+  // El inmueble en sí (la casa, el apartamento o el terreno)
+  const inmueble: Record<string, unknown> = {
     "@type": getPropertySchemaType(prop.tipo),
-    "@id": `${SITE_URL}/propiedades/${prop.codigo}`,
+    "@id": `${url}#inmueble`,
     name: prop.titulo,
-    description: prop.descripcion || prop.titulo,
-    url: `${SITE_URL}/propiedades/${prop.codigo}`,
-    image: prop.fotoPortadaUrl ? [prop.fotoPortadaUrl] : undefined,
     address: {
       "@type": "PostalAddress",
       addressCountry: "SV",
       addressRegion: prop.zonaMunicipio || undefined,
       addressLocality: prop.zonaNombre || undefined,
     },
-    offers: {
-      "@type": "Offer",
-      price: prop.precio,
-      priceCurrency: "USD",
-      availability: "https://schema.org/InStock",
-      seller: {
-        "@id": `${SITE_URL}/#organization`,
-      },
-      url: `${SITE_URL}/propiedades/${prop.codigo}`,
-    },
   };
 
-  const additionalProperty: Array<Record<string, unknown>> = [];
-
-  if (prop.habitaciones) {
-    additionalProperty.push({
-      "@type": "PropertyValue",
-      name: "Habitaciones",
-      value: prop.habitaciones,
-    });
+  if (tieneHabitaciones && prop.habitaciones) {
+    inmueble.numberOfBedrooms = prop.habitaciones;
   }
 
-  if (prop.banosCompletos) {
-    additionalProperty.push({
-      "@type": "PropertyValue",
-      name: "Baños",
-      value: prop.banosCompletos,
-    });
+  if (tieneHabitaciones && prop.banosCompletos) {
+    inmueble.numberOfBathroomsTotal = prop.banosCompletos;
   }
 
   if (prop.areaConstruccion) {
-    additionalProperty.push({
-      "@type": "PropertyValue",
-      name: "Área de construcción",
+    inmueble.floorSize = {
+      "@type": "QuantitativeValue",
       value: prop.areaConstruccion,
       unitCode: "MTK",
-    });
+      unitText: "m²",
+    };
   }
 
+  const additionalProperty: Array<Record<string, unknown>> = [];
+
   if (prop.areaTerreno) {
+    // Se publica la unidad tal como está guardada en Sanity, sin convertir.
+    const enMetros = prop.unidadTerreno === "m2";
+
     additionalProperty.push({
       "@type": "PropertyValue",
       name: "Área de terreno",
       value: prop.areaTerreno,
-      unitCode: "MTK",
+      ...(enMetros
+        ? { unitCode: "MTK", unitText: "m²" }
+        : { unitText: "v²" }),
     });
   }
 
@@ -277,25 +284,46 @@ export function getRealEstateListingSchema(prop: PropiedadSchema) {
     });
   }
 
-  if (prop.zonaNombre) {
-    additionalProperty.push({
-      "@type": "PropertyValue",
-      name: "Zona",
-      value: prop.zonaNombre,
-    });
-  }
-
-  if (prop.asesorNombre) {
-    additionalProperty.push({
-      "@type": "PropertyValue",
-      name: "Asesor",
-      value: prop.asesorNombre,
-    });
-  }
-
   if (additionalProperty.length > 0) {
-    schema.additionalProperty = additionalProperty;
+    inmueble.additionalProperty = additionalProperty;
   }
+
+  // El anuncio (la página): precio, disponibilidad, vendedor y autor
+  const schema: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "RealEstateListing",
+    "@id": `${url}#anuncio`,
+    url,
+    name: prop.titulo,
+    description: prop.descripcion || prop.titulo,
+    inLanguage: "es-SV",
+    datePosted: prop.fechaCreacion || undefined,
+    dateModified: prop.fechaModificacion || undefined,
+    image: prop.fotoPortadaUrl ? [prop.fotoPortadaUrl] : undefined,
+    author:
+      prop.asesorNombre && prop.asesorSlug
+        ? {
+            "@type": "Person",
+            "@id": `${SITE_URL}/asesores#${prop.asesorSlug}`,
+            name: prop.asesorNombre,
+          }
+        : undefined,
+    offers: {
+      "@type": "Offer",
+      price: prop.precio,
+      priceCurrency: "USD",
+      availability: getAvailability(prop.estado),
+      businessFunction:
+        prop.operacion === "alquiler"
+          ? "http://purl.org/goodrelations/v1#LeaseOut"
+          : "http://purl.org/goodrelations/v1#Sell",
+      url,
+      seller: {
+        "@id": `${SITE_URL}/#organization`,
+      },
+    },
+    mainEntity: inmueble,
+  };
 
   return schema;
 }
@@ -330,14 +358,6 @@ export function getWebsiteSchema() {
     inLanguage: "es-SV",
     publisher: {
       "@id": `${SITE_URL}/#organization`,
-    },
-    potentialAction: {
-      "@type": "SearchAction",
-      target: {
-        "@type": "EntryPoint",
-        urlTemplate: `${SITE_URL}/propiedades?q={search_term_string}`,
-      },
-      "query-input": "required name=search_term_string",
     },
   };
 }

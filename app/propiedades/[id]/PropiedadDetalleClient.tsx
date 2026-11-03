@@ -37,6 +37,14 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
   const tipo = propiedad?.tipo || "";
   const precio = Number(propiedad?.precio) || 0;
   const areaConstruccion = Number(propiedad?.areaConstruccion) || 0;
+  const estadoLabel =
+    propiedad?.estado === "vendida"
+      ? "Vendida"
+      : propiedad?.estado === "reservada"
+        ? "Reservada"
+        : null;
+  // Si el campo está vacío se asume varas cuadradas (como se mostraba antes)
+  const unidadTerreno = propiedad?.unidadTerreno === "m2" ? "m²" : "v²";
 
   const processedGallery = useMemo(() => {
     const gallery = propiedad?.galeria || [];
@@ -146,7 +154,7 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
   const nombreAsesor = propiedad?.asesor?.nombre || "Mario Rivas";
   const displayAsesor = propiedad?.asesor?.telefonoDisplay || "7988-9533";
   const cargoAsesor = propiedad?.asesor?.cargo || "Asesor Inmobiliario";
-  const emailAsesor = propiedad?.asesor?.email || "info@estucasasv.com";
+  const emailAsesor = propiedad?.asesor?.email || "estucasasv@gmail.com";
 
   const nextImage = () => {
     if (allImages.length === 0) return;
@@ -188,6 +196,12 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
           <div className="grid md:grid-cols-[1fr_auto] gap-6 items-start mb-2">
             <div>
               <div className="flex items-center gap-3 mb-3 flex-wrap">
+                {estadoLabel ? (
+                  <span className="bg-ink text-cream px-3 py-1.5 rounded-full text-[11px] tracking-[0.18em] uppercase font-semibold">
+                    {estadoLabel}
+                  </span>
+                ) : null}
+
                 {propiedad?.etiqueta ? (
                   <span className="bg-sun text-brand-blue-deep px-3 py-1.5 rounded-full text-[11px] tracking-[0.18em] uppercase font-semibold">
                     {propiedad.etiqueta}
@@ -395,7 +409,7 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
                   <div className="display text-2xl">
                     {propiedad.areaTerreno}
                   </div>
-                  <div className="text-xs text-ink-soft">v² terreno</div>
+                  <div className="text-xs text-ink-soft">{unidadTerreno} terreno</div>
                 </div>
               ) : null}
 
