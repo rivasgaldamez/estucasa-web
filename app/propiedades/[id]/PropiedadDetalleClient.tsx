@@ -252,6 +252,11 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
               <img
                 src={getImageUrl(allImages[activeImage].image, 1600, 900)}
                 alt={titulo}
+                width={1600}
+                height={900}
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
                 className="w-full h-full object-cover cursor-zoom-in"
                 onClick={() => setLightboxOpen(true)}
               />
@@ -308,6 +313,10 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
                     <img
                       src={getImageUrl(item.image, 200, 150)}
                       alt={`Vista ${index + 1}`}
+                      width={200}
+                      height={150}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover"
                     />
                   </button>
@@ -315,7 +324,7 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
               </div>
             ) : null}
 
-           {/* BOTONES DE ÁREAS (si hay etiquetas) */}
+            {/* BOTONES DE ÁREAS (si hay etiquetas) */}
             {areasWithLabels.length > 0 ? (
               <div className="mb-10">
                 <div className="eyebrow text-sun mb-3 flex items-center gap-2">
@@ -485,6 +494,10 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
                   <img
                     src={getImageUrl(propiedad.asesor.foto, 120, 120)}
                     alt={nombreAsesor}
+                    width={120}
+                    height={120}
+                    loading="lazy"
+                    decoding="async"
                     className="w-16 h-16 rounded-full object-cover"
                   />
                 ) : (
@@ -522,8 +535,7 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
                   <ArrowUpRight size={14} />
                 </WhatsAppLink>
 
-                <a
-                  href={`mailto:${emailAsesor}`}
+                <a href={`mailto:${emailAsesor}`}
                   className="w-full bg-transparent text-ink px-6 py-4 rounded-full text-sm font-medium inline-flex items-center justify-center gap-2 border border-black/10 hover:bg-ink hover:text-cream hover:border-ink transition-all"
                 >
                   <span>Enviar email</span>

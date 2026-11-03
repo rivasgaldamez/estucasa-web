@@ -290,7 +290,7 @@ export default function PreguntasFrecuentesClient({ faqs }: Props) {
                 </WhatsAppLink>
 
                 <WhatsAppLink
-                  href="https://wa.me/50377303994?text=Hola%20Carlos%2C%20tengo%20una%20pregunta%20sobre%20su%20servicio."
+                  href="https://wa.me/50373963858?text=Hola%20Carlos%2C%20tengo%20una%20pregunta%20sobre%20su%20servicio."
                   className="px-7 py-4 rounded-full text-sm font-medium inline-flex items-center gap-2 border border-white/25 text-cream hover:border-sun hover:text-sun transition-colors"
                 >
                   <span>WhatsApp Carlos - 7396-3858</span>

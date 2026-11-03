@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
 import { sanityClient } from "@/lib/sanity";
 import { queryDestacadas } from "@/lib/queries";
 import HomeClient from "./HomeClient";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
+
+export const revalidate = 600;
 
 type Destacada = {
   _id: string;

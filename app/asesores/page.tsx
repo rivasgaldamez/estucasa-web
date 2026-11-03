@@ -24,6 +24,7 @@ export const metadata: Metadata = {
   title: "Asesores - Mario Rivas y Carlos Díaz",
   description:
     "Conoce a Mario Rivas y Carlos Díaz, socios fundadores de ES Tu Casa Inmobiliaria. Especialistas en bienes raíces en El Salvador con experiencia desde 2019.",
+  alternates: { canonical: "/asesores" },
 };
 
 export default async function AsesoresPage() {

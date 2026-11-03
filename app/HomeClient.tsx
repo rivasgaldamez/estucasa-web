@@ -470,7 +470,7 @@ export default function HomeClient({ destacadas }: Props) {
             </WhatsAppLink>
 
             <WhatsAppLink
-              href="https://wa.me/50377303994"
+              href="https://wa.me/50373963858"
               className="bg-sun text-brand-blue-deep px-7 py-4 rounded-full text-sm font-semibold inline-flex items-center gap-2 hover:bg-sun-soft transition-colors"
             >
               <span>WhatsApp Carlos - 7396-3858</span>

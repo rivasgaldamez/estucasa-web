@@ -52,9 +52,7 @@ export const metadata: Metadata = {
   creator: "ES Tu Casa Inmobiliaria",
   publisher: "ES Tu Casa Inmobiliaria",
   metadataBase: new URL("https://estucasasv.com"),
-  alternates: {
-    canonical: "/",
-  },
+  
   openGraph: {
     title: "ES Tu Casa Inmobiliaria - El Salvador",
     description:
