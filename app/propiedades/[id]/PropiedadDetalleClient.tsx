@@ -28,6 +28,21 @@ type Props = {
   propiedad: any;
 };
 
+const AMENIDADES: Record<string, string> = {
+  piscina: "Piscina privada",
+  jardin: "Jardín",
+  chimenea: "Chimenea",
+  ac: "Aire acondicionado central",
+  seguridad: "Seguridad 24/7",
+  "planta-electrica": "Planta eléctrica",
+  cisterna: "Cisterna",
+  cochera: "Cochera techada",
+  bbq: "Área BBQ",
+  vista: "Vista panorámica",
+  gimnasio: "Gimnasio",
+  salon: "Salón de usos múltiples",
+};
+
 export default function PropiedadDetalleClient({ propiedad }: Props) {
   const [activeImage, setActiveImage] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -486,7 +501,7 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
                         className="flex items-center gap-2 text-sm py-2 px-4 bg-cream-warm rounded-full border border-black/5"
                       >
                         <span className="w-1.5 h-1.5 rounded-full bg-brand-blue" />
-                        <span>{amenidad}</span>
+                        <span>{AMENIDADES[amenidad] || amenidad}</span>
                       </div>
                     )
                   )}
@@ -501,6 +516,7 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
                   <iframe
                     src={getYoutubeEmbedUrl(propiedad.videoYoutube)}
                     title="Video tour"
+                    loading="lazy"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                     className="w-full h-full"
