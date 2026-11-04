@@ -60,6 +60,10 @@ export default function HomeClient({ destacadas }: Props) {
     }
   };
 
+  const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+  const ahora = new Date();
+  const mesAnio = `${meses[ahora.getMonth()]} ${ahora.getFullYear()}`;
+
   const lanes = [
     {
       num: "I",
@@ -111,8 +115,7 @@ export default function HomeClient({ destacadas }: Props) {
         <div className="max-w-[1440px] mx-auto relative z-10">
           <div className="flex justify-between items-center mb-14 flex-wrap gap-4">
             <div className="eyebrow text-sun animate-fade-up">
-              <span className="text-ink-soft">SV - Edicion</span> No 012 -
-              Abril 2026
+              <span className="text-ink-soft">SV - Edición</span> <span suppressHydrationWarning>{mesAnio}</span>
             </div>
 
             <div className="eyebrow text-ink-soft animate-fade-up hidden md:block">

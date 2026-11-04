@@ -8,6 +8,9 @@ import {
 } from "@/lib/schema";
 import BlogClient from "./BlogClient";
 
+// Se regenera solo cada 10 minutos
+export const revalidate = 600;
+
 export const metadata: Metadata = {
   title: "Blog - Guías y análisis inmobiliario",
   description:

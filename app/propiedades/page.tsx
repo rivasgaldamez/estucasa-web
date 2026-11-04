@@ -4,6 +4,9 @@ import { queryPropiedades } from "@/lib/queries";
 import { getBreadcrumbSchema, jsonLdScript } from "@/lib/schema";
 import PropiedadesClient from "./PropiedadesClient";
 
+// Se regenera solo cada 10 minutos
+export const revalidate = 600;
+
 type Propiedad = {
   _id: string;
   codigo: string;

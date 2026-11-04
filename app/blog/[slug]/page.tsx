@@ -12,6 +12,21 @@ import {
 } from "@/lib/schema";
 import ArticuloDetalleClient from "./ArticuloDetalleClient";
 
+// Los articulos existentes se generan al publicar y se refrescan cada 10 minutos
+export const revalidate = 600;
+
+export async function generateStaticParams() {
+  try {
+    const slugs = await sanityClient.fetch<string[]>(
+      `*[_type == "articulo" && defined(slug.current)].slug.current`
+    );
+
+    return slugs.map((slug) => ({ slug }));
+  } catch {
+    return [];
+  }
+}
+
 type Props = {
   params: Promise<{
     slug: string;
@@ -32,6 +47,7 @@ type Articulo = {
   destacado?: boolean;
   tiempoLectura?: number;
   contenido?: unknown[];
+  _updatedAt?: string;
   metaTitulo?: string;
   metaDescripcion?: string;
   palabrasClave?: string[];
@@ -102,6 +118,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: articulo.metaDescripcion || articulo.extracto,
       type: "article",
       publishedTime: articulo.fechaPublicacion,
+      modifiedTime: articulo._updatedAt,
       authors: articulo.autor ? [articulo.autor.nombre] : undefined,
       images: imagenUrl
         ? [
@@ -159,6 +176,7 @@ export default async function ArticuloDetallePage({ params }: Props) {
     slug: articulo.slug || slug,
     extracto: articulo.extracto,
     fechaPublicacion: articulo.fechaPublicacion,
+    fechaModificacion: articulo._updatedAt,
     imagenUrl,
     autorNombre: articulo.autor?.nombre || "ES Tu Casa Inmobiliaria",
     autorSlug: articulo.autor?.slug || "es-tu-casa",

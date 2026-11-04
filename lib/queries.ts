@@ -179,6 +179,7 @@ export const queryArticuloPorSlug = `*[
   destacado,
   tiempoLectura,
   contenido,
+  _updatedAt,
   metaTitulo,
   metaDescripcion,
   palabrasClave,

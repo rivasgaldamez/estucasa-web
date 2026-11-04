@@ -147,6 +147,7 @@ type ArticuloSchema = {
   slug: string;
   extracto: string;
   fechaPublicacion: string;
+  fechaModificacion?: string;
   imagenUrl?: string;
   autorNombre: string;
   autorSlug: string;
@@ -163,7 +164,7 @@ export function getArticleSchema(articulo: ArticuloSchema) {
     description: articulo.extracto,
     image: articulo.imagenUrl ? [articulo.imagenUrl] : undefined,
     datePublished: articulo.fechaPublicacion,
-    dateModified: articulo.fechaPublicacion,
+    dateModified: articulo.fechaModificacion || articulo.fechaPublicacion,
     author: {
       "@type": "Person",
       "@id": `${SITE_URL}/asesores#${articulo.autorSlug}`,
