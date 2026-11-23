@@ -23,14 +23,35 @@ export default function LanguageSwitcher() {
   const [lang, setLang] = useState("es");
 
   useEffect(() => {
-    setLang(getCurrentLang());
+    const current = getCurrentLang();
+    setLang(current);
+    if (current === "es") return;
+
+    // Aplicar el idioma guardado cuando el widget termine de cargar
+    let tries = 0;
+    const timer = window.setInterval(() => {
+      tries++;
+      const w = window as unknown as { doGTranslate?: (pair: string) => void };
+      const sel = document.querySelector<HTMLSelectElement>("select.gt_selector");
+      if (typeof w.doGTranslate === "function" && sel) {
+        window.clearInterval(timer);
+        if (sel.value === `es|${current}`) return;
+        let last = 0;
+        try { last = Number(sessionStorage.getItem("gt-last") || 0); } catch {}
+        if (Date.now() - last < 3000) return; // freno anti-bucle
+        try { sessionStorage.setItem("gt-last", String(Date.now())); } catch {}
+        w.doGTranslate(`es|${current}`);
+      } else if (tries > 40) {
+        window.clearInterval(timer);
+      }
+    }, 250);
+    return () => window.clearInterval(timer);
   }, []);
 
   const changeLang = (code: string) => {
     const domain = window.location.hostname;
 
     if (code === "es") {
-      // Volver al español = borrar la cookie de traducción
       document.cookie =
         "googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC";
       document.cookie = `googtrans=; path=/; domain=.${domain}; expires=Thu, 01 Jan 1970 00:00:00 UTC`;
@@ -40,8 +61,15 @@ export default function LanguageSwitcher() {
       document.cookie = `googtrans=${value}; path=/; domain=.${domain}`;
     }
 
-    // Recargar para que el motor aplique el idioma
-    window.location.reload();
+    setLang(code);
+    const w = window as unknown as { doGTranslate?: (pair: string) => void };
+    if (typeof w.doGTranslate === "function") {
+      try { sessionStorage.setItem("gt-last", String(Date.now())); } catch {}
+      w.doGTranslate(`es|${code}`);
+      if (code === "es") window.setTimeout(() => window.location.reload(), 300);
+    } else {
+      window.location.reload();
+    }
   };
 
   return (
