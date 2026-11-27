@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Concepto 2 — Vuelo de regreso</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--cream:#F6F1E7;--night:#061132;--blue:#1B3A9C;--sun:#F5A800;--sun-soft:#FFD060}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:2560px;height:1440px;overflow:hidden}
+  body{background:var(--night);font-family:'Figtree',sans-serif;-webkit-font-smoothing:antialiased;position:relative}
+
+  /* La foto ocupa la derecha: el destino */
+  .dest{position:absolute;right:0;top:0;width:1580px;height:1440px;overflow:hidden}
+  .dest img{width:100%;height:100%;object-fit:cover;object-position:center 52%;
+    filter:brightness(1.22) saturate(1.2)}
+  /* Degradado que disuelve la foto hacia la izquierda: de la noche al trópico */
+  .dissolve{position:absolute;right:0;top:0;width:1580px;height:1440px;
+    background:linear-gradient(90deg, var(--night) 0%, rgba(6,17,50,.94) 22%,
+      rgba(6,17,50,.70) 42%, rgba(6,17,50,.34) 64%, rgba(6,17,50,.10) 88%, rgba(6,17,50,.04) 100%)}
+  .left{position:absolute;left:0;top:0;width:1100px;height:1440px;
+    background:linear-gradient(90deg,var(--night) 60%, rgba(6,17,50,.92) 100%)}
+  .vfade{position:absolute;inset:0;background:linear-gradient(180deg,
+    var(--night) 0%, rgba(6,17,50,.86) 22%, rgba(6,17,50,.04) 34%,
+    rgba(6,17,50,.04) 66%, rgba(6,17,50,.86) 78%, var(--night) 100%)}
+
+  /* La ruta */
+  .route{position:absolute;inset:0}
+  .band{position:absolute;left:0;right:0;top:508.5px;height:423px;
+    border-top:1px solid rgba(246,241,231,.12);border-bottom:1px solid rgba(246,241,231,.12)}
+
+  .safe{position:absolute;left:50%;top:508.5px;transform:translateX(-50%);
+    width:1546px;height:423px}
+
+  .brand{position:absolute;left:6px;top:50%;transform:translateY(-50%);
+    display:flex;align-items:center;gap:34px}
+  .plate{width:178px;height:178px;border-radius:24px;background:var(--cream);
+    display:flex;align-items:center;justify-content:center;box-shadow:0 16px 40px rgba(0,0,0,.5)}
+  .plate img{width:150px;height:150px;object-fit:contain;margin-top:-5px}
+
+  .copy{min-width:0}
+  .from{font-size:17px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;
+    color:var(--sun-soft);margin-bottom:16px;white-space:nowrap}
+  h1{font-family:'Instrument Serif',serif;font-weight:400;font-size:92px;line-height:.98;
+     letter-spacing:-.02em;color:var(--cream);white-space:nowrap;text-shadow:0 4px 24px rgba(0,0,0,.55)}
+  h1 em{font-style:italic;color:var(--sun-soft)}
+  .sub{margin-top:20px;font-size:24px;color:rgba(246,241,231,.86);white-space:nowrap;
+    text-shadow:0 2px 12px rgba(0,0,0,.6)}
+  .sub b{color:#fff;font-weight:600}
+
+  /* Destino, anclado sobre la foto */
+  .pin{position:absolute;right:26px;top:50%;transform:translateY(-50%);
+    display:flex;flex-direction:column;align-items:center;gap:14px}
+  .ring{width:30px;height:30px;border-radius:50%;background:var(--sun);
+    box-shadow:0 0 0 9px rgba(245,168,0,.26), 0 0 0 20px rgba(245,168,0,.12), 0 0 40px rgba(245,168,0,.6)}
+  .pin .l{font-size:16px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#fff;
+    text-shadow:0 2px 12px rgba(0,0,0,.8);white-space:nowrap}
+  .pin .s{font-size:17px;font-weight:700;color:var(--sun-soft);text-shadow:0 2px 10px rgba(0,0,0,.8)}
+
+  .guides{display:none}body.show-guides .guides{display:block}
+  .g1{position:absolute;left:50%;top:508.5px;transform:translateX(-50%);width:1546px;height:423px;border:3px dashed #FF5A5F}
+</style>
+</head>
+<body>
+  <div class="dest"><img src="fotos/i-limpia.jpg" alt=""></div>
+  <div class="dissolve"></div>
+  <div class="left"></div>
+  <div class="vfade"></div>
+
+  <!-- Ruta de vuelo: sale de la noche y aterriza en la costa -->
+  <svg class="route" viewBox="0 0 2560 1440" fill="none">
+    <path d="M 60 1210 Q 1120 880 2012 722"
+          stroke="#F5A800" stroke-width="4" stroke-dasharray="16 20"
+          stroke-linecap="round" opacity=".55"/>
+    <path d="M 60 1210 Q 1120 880 2012 722"
+          stroke="#FFD060" stroke-width="16" opacity=".07" filter="blur(6px)"/>
+    <!-- avión en el origen -->
+    <g transform="translate(60,1210) rotate(-17)" opacity=".9">
+      <path d="M 0 0 L -30 11 L -21 0 L -30 -11 Z" fill="#FFD060"/>
+    </g>
+  </svg>
+
+  <div class="band"></div>
+
+  <div class="safe">
+    <div class="brand">
+      <div class="plate"><img src="logo.png" alt="ES Tu Casa"></div>
+      <div class="copy">
+        <div class="from">Desde donde estés · De regreso a casa</div>
+        <h1>El Salvador <em>es tu casa.</em></h1>
+        <div class="sub">Casas frente al mar y terrenos para el <b>Hermano Lejano</b></div>
+      </div>
+    </div>
+
+    <div class="pin">
+      <div class="ring"></div>
+      <div class="l">El Salvador</div>
+      <div class="s">estucasasv.com</div>
+    </div>
+  </div>
+
+  <div class="guides"><div class="g1"></div></div>
+<script>if(new URLSearchParams(location.search).get('guides')==='1')document.body.classList.add('show-guides');</script>
+</body>
+</html>

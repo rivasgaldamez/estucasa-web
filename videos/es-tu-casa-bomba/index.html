@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/MotionPathPlugin.min.js"></script>
+    <style>
+      /* Bebas Neue vendorizada — sin Google Fonts */
+      @font-face {
+        font-family: "Bebas Neue";
+        src: url("./assets/fonts/BebasNeue-Regular.ttf") format("truetype");
+        font-weight: 400;
+        font-display: block;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+
+      #root {
+        position: relative; width: 100%; height: 100%;
+        font-family: "Bebas Neue", sans-serif;
+        background: linear-gradient(180deg, #0d2060 0%, #0b1a4d 40%, #050a1e 76%, #000000 100%);
+      }
+      #vignette {
+        position: absolute; inset: 0;
+        background:
+          radial-gradient(ellipse 62% 42% at 50% 46%, rgba(255,255,255,0.06) 0%, rgba(0,0,0,0) 62%),
+          radial-gradient(ellipse 78% 60% at 50% 48%, rgba(0,0,0,0) 46%, rgba(0,0,0,0.58) 100%);
+      }
+      #shake { position: absolute; inset: 0; }
+
+      #stage {
+        position: absolute; left: 0; right: 0; top: 700px;
+        perspective: 800px; text-align: center;
+      }
+      .line { display: block; white-space: nowrap; }
+      #l1 { font-size: 168px; line-height: 1.28; letter-spacing: 0.035em; }
+      #l2 { font-size: 104px; line-height: 1.42; letter-spacing: 0.11em; }
+
+      .ltr { position: relative; display: inline-block; color: #fff; }
+      .ltr.gold { color: #f5a800; }
+      .ltr.sp { width: 0.34em; }
+
+      .move { display: inline-block; transform-origin: 50% 100%; will-change: transform, opacity; }
+      .base { display: inline-block; will-change: opacity; }
+      .frag {
+        position: absolute; left: 0; top: 0; display: inline-block;
+        color: inherit; opacity: 0; will-change: transform, opacity; pointer-events: none;
+      }
+      /* estela: copias doradas que siguen la misma curva con retardo */
+      .ghost {
+        position: absolute; left: 0; top: 0; display: inline-block;
+        color: #f5a800; opacity: 0; filter: blur(7px);
+        will-change: transform, opacity; pointer-events: none;
+      }
+
+      #pcanvas { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+
+      #sweep {
+        position: absolute; top: -260px; left: 0; width: 420px; height: 2440px;
+        transform: rotate(18deg);
+        background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.10) 34%,
+          rgba(255,248,224,0.85) 50%, rgba(255,255,255,0.10) 66%, rgba(255,255,255,0) 100%);
+        mix-blend-mode: screen; opacity: 0; pointer-events: none;
+      }
+
+      #wave {
+        position: absolute; left: 50%; top: 900px; width: 220px; height: 220px;
+        margin: -110px 0 0 -110px; border-radius: 50%;
+        border: 7px solid rgba(255,225,150,0.95);
+        opacity: 0; pointer-events: none;
+      }
+      #boom {
+        position: absolute; left: 50%; top: 900px; width: 1500px; height: 1500px;
+        margin: -750px 0 0 -750px; border-radius: 50%;
+        background: radial-gradient(circle, #ffffff 0%, #fff0c4 26%, #f5a800 52%, rgba(245,168,0,0) 74%);
+        opacity: 0; mix-blend-mode: screen; pointer-events: none;
+      }
+
+      #plate {
+        position: absolute; left: 285px; top: 730px; width: 510px; height: 510px;
+        border-radius: 46px; background: #f8f3e9;
+        box-shadow: 0 0 0 3px rgba(245,168,0,0.9), 0 36px 90px rgba(0,0,0,0.45);
+      }
+      #logo { position: absolute; left: 348px; top: 793px; width: 384px; height: 384px; display: block; }
+      #flash {
+        position: absolute; inset: 0; opacity: 0; pointer-events: none;
+        background: radial-gradient(circle at 50% 50%, #fff2cf 0%, #f5a800 42%, rgba(245,168,0,0) 74%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="10"
+         data-width="1080" data-height="1920">
+      <div id="vignette" class="clip" data-start="0" data-duration="10" data-track-index="0"></div>
+
+      <div id="shake" class="clip" data-layout-allow-overlap data-layout-allow-occlusion
+           data-layout-allow-overflow data-start="0" data-duration="10" data-track-index="1">
+        <!-- el canvas pinta DEBAJO del texto: nunca tapa letras visibles -->
+        <canvas id="pcanvas" width="1080" height="1920"></canvas>
+        <div id="stage">
+          <span class="line" id="l1"></span>
+          <span class="line" id="l2"></span>
+        </div>
+      </div>
+
+      <div id="sweep" class="clip" data-layout-allow-overflow
+           data-start="3.5" data-duration="2.6" data-track-index="2"></div>
+      <div id="wave" class="clip" data-layout-allow-overflow
+           data-start="8.4" data-duration="1.2" data-track-index="3"></div>
+      <div id="boom" class="clip" data-layout-allow-overflow
+           data-start="8.4" data-duration="1.0" data-track-index="4"></div>
+
+      <div id="plate" class="clip" data-start="9.1" data-duration="0.9" data-track-index="5"></div>
+      <img id="logo" class="clip" src="./assets/img/logo.png" alt=""
+           data-start="9.1" data-duration="0.9" data-track-index="6" />
+      <div id="flash" class="clip" data-start="9.0" data-duration="0.8" data-track-index="7"></div>
+    </div>
+
+    <script>
+      gsap.registerPlugin(MotionPathPlugin);
+      window.READY = false;
+
+      /* ================= PRNG determinista — mulberry32, cero Math.random ============= */
+      function mulberry32(a) {
+        return function () {
+          a |= 0; a = (a + 0x6d2b79f5) | 0;
+          let t = Math.imul(a ^ (a >>> 15), 1 | a);
+          t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+      const SEED = 20260927;
+      const rnd = mulberry32(SEED);   // stream de build: orden de consumo fijo
+      function hash01(i, step) {      // hash posicional puro -> scramble seek-safe
+        return mulberry32((SEED ^ Math.imul(i + 1, 2654435761) ^ Math.imul(step + 1, 40503)) | 0)();
+      }
+
+      /* ================= construcción del texto ================= */
+      const ALFA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      const LINES = [
+        { el: document.getElementById("l1"), text: "ES TU CASA",  gold: [6, 7, 8, 9] },
+        { el: document.getElementById("l2"), text: "INMOBILIARIA", gold: [] },
+      ];
+      const FRAGS = 3, GHOSTS = 2;
+
+      LINES.forEach((L, LI) => {
+        L.letters = [];
+        [...L.text].forEach((ch, i) => {
+          const s = document.createElement("span");
+          s.className = "ltr" + (ch === " " ? " sp" : "") + (L.gold.includes(i) ? " gold" : "");
+          if (ch === " ") { L.el.appendChild(s); return; }
+          const mv = document.createElement("span"); mv.className = "move";
+          const base = document.createElement("span"); base.className = "base"; base.textContent = ch;
+          mv.appendChild(base);
+          const fr = [];
+          for (let k = 0; k < FRAGS; k++) {
+            const f = document.createElement("span"); f.className = "frag"; f.textContent = ch;
+            const a = (k / FRAGS) * 100, b = ((k + 1) / FRAGS) * 100;
+            f.style.clipPath = `polygon(-20% ${a}%, 120% ${a}%, 120% ${b}%, -20% ${b}%)`;
+            mv.appendChild(f); fr.push(f);
+          }
+          s.appendChild(mv);
+          const gh = [];
+          for (let k = 0; k < GHOSTS; k++) {
+            const g = document.createElement("span"); g.className = "ghost"; g.textContent = ch;
+            s.appendChild(g); gh.push(g);
+          }
+          L.el.appendChild(s);
+          L.letters.push({ el: s, mv, base, ch, frags: fr, ghosts: gh,
+                          li: LI, ix: L.letters.length });
+        });
+      });
+      const ALL = LINES.flatMap((L) => L.letters);
+
+      /* ================= campo de puntos (canvas 2D) ================= */
+      const PT_START = 6.9, BOOM = 8.5, CX = 540, CY = 900;
+      const cv = document.getElementById("pcanvas"), cx2 = cv.getContext("2d");
+      const PAL = ["#f5a800", "#ffffff", "#00c9a7"];
+      let PARTS = null;
+
+      function buildParticles() {
+        // se muestrea el texto ya maquetado, con la fuente cargada
+        const oc = document.createElement("canvas"); oc.width = 1080; oc.height = 1920;
+        const g = oc.getContext("2d");
+        g.textBaseline = "top"; g.fillStyle = "#fff";
+        const rr = document.getElementById("root").getBoundingClientRect();
+        ALL.forEach((lt) => {
+          const r = lt.base.getBoundingClientRect();
+          g.font = getComputedStyle(lt.el).fontSize + ' "Bebas Neue"';
+          g.fillText(lt.ch, r.left - rr.left, r.top - rr.top);
+        });
+        const d = g.getImageData(0, 0, 1080, 1920).data;
+        const raw = [];
+        for (let y = 0; y < 1920; y += 3)
+          for (let x = 0; x < 1080; x += 3)
+            if (d[(y * 1080 + x) * 4 + 3] > 40) raw.push([x, y]);
+        const stride = Math.max(1, Math.ceil(raw.length / 7200));
+        const out = [];
+        for (let i = 0; i < raw.length; i += stride) {
+          const [x, y] = raw[i];
+          const a = Math.atan2(y - CY, x - CX) + (rnd() - 0.5) * 0.5;
+          const sp = 320 + rnd() * 1180;
+          out.push({
+            x, y,
+            r: 1.5 + rnd() * 1.5,
+            c: PAL[Math.floor(rnd() * 3)],
+            vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - rnd() * 240,
+            ph: rnd() * 6.283, dl: rnd() * 0.12,
+          });
+        }
+        return out;
+      }
+
+      // posición ANALÍTICA en función de t: nada acumulado por frame -> SEEK exacto
+      function drawParticles(t) {
+        cx2.clearRect(0, 0, 1080, 1920);
+        if (t < PT_START) return;
+        if (!PARTS) PARTS = buildParticles();
+        const fadeIn = Math.min(1, (t - PT_START) / 0.22);
+        const tb = t - BOOM;
+        for (let i = 0; i < PARTS.length; i++) {
+          const p = PARTS[i];
+          let x, y, al = fadeIn, r = p.r;
+          if (tb <= 0) {                       // reposo con deriva mínima
+            x = p.x + Math.sin(t * 1.3 + p.ph) * 2.2;
+            y = p.y + Math.cos(t * 1.1 + p.ph) * 2.2;
+          } else {                             // balística: v*τ + ½·g·τ²
+            const τ = Math.max(0, tb - p.dl);
+            x = p.x + p.vx * τ;
+            y = p.y + p.vy * τ + 0.5 * 950 * τ * τ;
+            al = fadeIn * Math.max(0, 1 - τ / 0.95);
+            r = p.r * (1 + τ * 1.6);
+          }
+          if (al <= 0.01) continue;
+          cx2.globalAlpha = al;
+          cx2.fillStyle = p.c;
+          cx2.beginPath(); cx2.arc(x, y, r, 0, 6.283); cx2.fill();
+        }
+        cx2.globalAlpha = 1;
+      }
+
+      /* ================= timeline única, pausada ================= */
+      const tl = gsap.timeline({ paused: true });
+
+      /* --- 1) 0.0–1.5 SCRAMBLE --- */
+      const SCR = 1.5, STEP = 1 / 16;
+      const scr = { p: 0 };
+      tl.to(scr, { p: 1, duration: SCR, ease: "none", onUpdate: () => {
+        const t = scr.p * SCR, step = Math.floor(t / STEP);
+        LINES.forEach((L) => {
+          const n = L.letters.length;
+          L.letters.forEach((lt, i) => {
+            const lock = (i / Math.max(n - 1, 1)) * SCR * 0.88;
+            lt.base.firstChild.nodeValue = (t >= lock) ? lt.ch
+              : ALFA[Math.floor(hash01(i + L.text.length * 31, step) * 26)];
+          });
+        });
+      }}, 0);
+      gsap.set(ALL.map((l) => l.mv), { opacity: 0.62 });
+
+      /* --- 2) 1.5–3.5 TRAYECTORIA CURVA + SLIDE 3D + ESTELA --- */
+      ALL.forEach((lt, gi) => {
+        const side = gi % 2 ? 1 : -1;
+        const sx = side * (760 + rnd() * 420), sy = 420 + rnd() * 520;
+        const mx = side * (240 + rnd() * 180), my = -(150 + rnd() * 160);
+        // el último tramo llega horizontal -> autoRotate deja la letra recta
+        const path = [{ x: sx, y: sy }, { x: mx, y: my }, { x: -150, y: 0 }, { x: 0, y: 0 }];
+        // stagger 0.04 dentro de la línea; 0.25 de diferencia entre líneas
+        const t0 = 1.5 + lt.ix * 0.04 + lt.li * 0.25;
+        const tilt = (rnd() - 0.5) * 34;   // "autoRotate suave": inclinación que resuelve a 0
+        // La curva va con power2.out (sin overshoot) para que la letra aterrice EXACTA.
+        // back.out(1.4) va en la rotación, que es donde se siente el rebote.
+        tl.fromTo(lt.mv, { opacity: 0 },
+          { opacity: 1, duration: 0.95, ease: "power2.out", immediateRender: false,
+            motionPath: { path, curviness: 1.3, autoRotate: false } }, t0);
+        tl.fromTo(lt.mv, { rotationX: -90, rotation: tilt },
+          { rotationX: 0, rotation: 0, duration: 0.95, ease: "back.out(1.4)",
+            immediateRender: false }, t0);
+        lt.ghosts.forEach((g, k) => {
+          tl.fromTo(g, { opacity: 0 },
+            { opacity: 0.42 - k * 0.16, duration: 0.3, ease: "none", immediateRender: false }, t0);
+          tl.to(g, { opacity: 0, duration: 0.4, ease: "power1.in" }, t0 + 0.55);
+          tl.fromTo(g, { xPercent: 0 },
+            { duration: 0.95, ease: "power2.out", immediateRender: false,
+              motionPath: { path, curviness: 1.3, autoRotate: false } }, t0 - (k + 1) * 0.055);
+        });
+      });
+      tl.to(ALL.map((l) => l.mv), { opacity: 1, duration: 0.2 }, 3.3);
+
+      /* --- 3) 3.5–6.0 GLOW + BARRIDO (2 pasadas) --- */
+      const gl = { i: 0 };
+      tl.to(gl, { i: 1, duration: 2.5, ease: "none", onUpdate: () => {
+        const k = (1 - Math.cos(gl.i * Math.PI * 4)) / 2;
+        const r = 10 + k * 34, o = 0.30 + k * 0.55;
+        const css = `0 0 ${r}px rgba(245,168,0,${o}), 0 0 ${r * 2.4}px rgba(245,168,0,${o * 0.5})`;
+        LINES.forEach((L) => { L.el.style.textShadow = css; });
+        document.getElementById("stage").style.filter =
+          `drop-shadow(0 0 ${6 + k * 16}px rgba(245,168,0,${0.20 + k * 0.35}))`;
+      }}, 3.5);
+      tl.set(LINES.map((L) => L.el), { clearProps: "textShadow" }, 6.0);
+      tl.set("#stage", { clearProps: "filter" }, 6.0);
+
+      gsap.set("#sweep", { x: -520, opacity: 0 });
+      [3.65, 4.85].forEach((t0) => {
+        tl.to("#sweep", { opacity: 1, duration: 0.10 }, t0);
+        tl.fromTo("#sweep", { x: -520 }, { x: 1180, duration: 0.95, ease: "power1.inOut" }, t0);
+        tl.to("#sweep", { opacity: 0, duration: 0.14 }, t0 + 0.88);
+      });
+
+      /* --- 4) 6.0–8.5 SHATTER y luego DESINTEGRACIÓN EN PUNTOS --- */
+      const shards = [];
+      ALL.forEach((lt) => lt.frags.forEach((f) => shards.push({
+        f, x: (rnd() - 0.5) * 120, y: (rnd() - 0.5) * 110,
+        rz: (rnd() - 0.5) * 40, d: rnd() * 0.3,
+      })));
+      gsap.set(shards.map((s) => s.f), { opacity: 0 });
+      tl.set(ALL.map((l) => l.base), { opacity: 0 }, 6.0);
+      tl.set(shards.map((s) => s.f), { opacity: 1 }, 6.0);
+      shards.forEach((s) => {
+        tl.to(s.f, { x: s.x, y: s.y, rotation: s.rz, duration: 0.85, ease: "power2.out" }, 6.05 + s.d);
+      });
+      // relevo sin salto: los trozos se apagan mientras el campo de puntos se enciende
+      tl.to(shards.map((s) => s.f), { opacity: 0, duration: 0.22, ease: "power1.in" }, PT_START);
+      tl.set("#stage", { opacity: 0 }, PT_START + 0.22);
+
+      /* --- 5) 8.5–10.0 BOMBA --- */
+      gsap.set("#boom", { opacity: 0, scale: 0.18 });
+      gsap.set("#wave", { opacity: 0, scale: 0.3 });
+      tl.to("#boom", { opacity: 0.95, scale: 0.85, duration: 0.10, ease: "power2.out" }, BOOM - 0.04);
+      tl.to("#boom", { opacity: 0, scale: 1.5, duration: 0.55, ease: "power2.in" }, BOOM + 0.08);
+      tl.fromTo("#wave", { scale: 0.3, opacity: 0.95, borderWidth: 7 },
+        { scale: 5.6, opacity: 0, borderWidth: 1, duration: 0.85, ease: "power2.out" }, BOOM);
+      tl.to("#pcanvas", { filter: "blur(7px)", duration: 0.9, ease: "power1.in" }, BOOM + 0.1);
+
+      // sacudida de cámara 0.25s, valores sembrados (deterministas)
+      const sh = [];
+      for (let i = 0; i < 8; i++) sh.push({ x: (rnd() - 0.5) * 46, y: (rnd() - 0.5) * 38 });
+      sh.forEach((v, i) => tl.to("#shake", { x: v.x, y: v.y, duration: 0.25 / 8, ease: "none" },
+                                 BOOM + i * (0.25 / 8)));
+      tl.to("#shake", { x: 0, y: 0, duration: 0.08, ease: "power2.out" }, BOOM + 0.25);
+
+      /* --- cierre: logo con destello dorado --- */
+      gsap.set(["#plate", "#logo"], { opacity: 0, scale: 0.82, transformOrigin: "50% 50%" });
+      gsap.set("#flash", { opacity: 0, scale: 0.7, transformOrigin: "50% 50%" });
+      tl.to("#flash", { opacity: 0.85, scale: 1.15, duration: 0.13, ease: "power2.out" }, 9.02);
+      tl.to("#flash", { opacity: 0, scale: 1.6, duration: 0.45, ease: "power2.in" }, 9.15);
+      tl.to(["#plate", "#logo"], { opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.6)" }, 9.12);
+      tl.to(["#plate", "#logo"], { scale: 1.02, duration: 0.7, ease: "power1.out" }, 9.62);
+
+      /* --- motor del canvas: se evalúa desde t en cada frame --- */
+      const drv = { p: 0 };
+      tl.to(drv, { p: 1, duration: 10, ease: "none",
+                   onUpdate: () => drawParticles(drv.p * 10) }, 0);
+
+      /* ================= API + contrato HyperFrames ================= */
+      window.tl = tl;
+      window.__timelines["main"] = tl;
+      window.DURATION = () => 10;
+      window.SEEK = (t) => tl.seek(Math.max(0, Math.min(t, window.DURATION())), false);
+      window.SEEK(0);
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => { PARTS = null; window.READY = true; });
+      } else { window.READY = true; }
+    </script>
+  </body>
+</html>

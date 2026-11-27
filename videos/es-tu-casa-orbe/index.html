@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/MotionPathPlugin.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "Bebas Neue";
+        src: url("./assets/fonts/BebasNeue-Regular.ttf") format("truetype");
+        font-weight: 400; font-display: block;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+      #root {
+        position: relative; width: 100%; height: 100%;
+        font-family: "Bebas Neue", sans-serif; background: #0d2060;
+      }
+      #bg {
+        position: absolute; inset: 0;
+        background: radial-gradient(ellipse 90% 60% at 50% 42%, #13297a 0%, rgba(13,32,96,0) 70%),
+                    linear-gradient(180deg, #0d2060 0%, #0b1a4d 45%, #050a1e 80%, #000 100%);
+      }
+      #stage { position: absolute; inset: 0; }
+      canvas { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+      #tcanvas { filter: blur(1.5px); }
+
+      /* ---------- texto ---------- */
+      #title { position: absolute; inset: 0; }
+      .line { position: absolute; left: 0; right: 0; text-align: center; white-space: nowrap; line-height: 1; }
+      #l1 { top: 770px; font-size: 176px; perspective: 900px; }
+      #l2 { top: 978px; font-size: 96px; perspective: 800px; }
+      .L { position: relative; display: inline-block; text-align: center; color: #fff; }
+      #l1 .L { margin: 0 .02em; }
+      #l2 .L { margin: 0 .07em; }
+      .L.gold { color: #f5a800; }
+      .S { display: inline-block; width: .3em; }
+      .g { display: inline-block; }
+      .frag { position: absolute; left: 0; top: 0; width: 100%; text-align: center; opacity: 0; }
+
+      /* ---------- luz ---------- */
+      #sweep {
+        position: absolute; top: -260px; left: 0; width: 420px; height: 2440px;
+        mix-blend-mode: screen; opacity: 0; pointer-events: none;
+        background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.08) 32%,
+          rgba(255,250,232,.80) 50%, rgba(255,255,255,.08) 68%, rgba(255,255,255,0) 100%);
+      }
+      #orbglow {
+        position: absolute; left: 280px; top: 640px; width: 520px; height: 520px;
+        border-radius: 50%; opacity: 0; pointer-events: none;
+        background: radial-gradient(circle, rgba(245,168,0,.26) 0%, rgba(0,201,167,.10) 38%, rgba(0,201,167,0) 68%);
+      }
+      #charge {
+        position: absolute; left: 420px; top: 780px; width: 240px; height: 240px;
+        border-radius: 50%; opacity: 0; pointer-events: none; mix-blend-mode: screen;
+        background: radial-gradient(circle, #fffaf0 0%, rgba(255,226,150,.8) 22%, rgba(245,168,0,0) 70%);
+      }
+      #flash {
+        position: absolute; left: 90px; top: 450px; width: 900px; height: 900px;
+        border-radius: 50%; opacity: 0; pointer-events: none; mix-blend-mode: screen;
+        background: radial-gradient(circle, #fff8e6 0%, rgba(255,214,120,.75) 24%, rgba(245,168,0,.25) 48%, rgba(245,168,0,0) 70%);
+      }
+
+      /* ---------- logo ---------- */
+      #plate {
+        position: absolute; left: 260px; top: 590px; width: 560px; height: 560px;
+        border-radius: 48px; background: #f8f3e9; opacity: 0;
+        box-shadow: 0 0 0 3px rgba(245,168,0,.9), 0 34px 84px rgba(0,0,0,.45);
+      }
+      #logo { position: absolute; left: 290px; top: 620px; width: 500px; height: 500px; opacity: 0; }
+      #site {
+        position: absolute; left: 0; right: 0; top: 1200px; text-align: center;
+        font-size: 80px; letter-spacing: .14em; color: #f5a800; opacity: 0;
+      }
+      #vignette {
+        position: absolute; inset: 0; pointer-events: none;
+        background: radial-gradient(ellipse 78% 60% at 50% 47%, rgba(0,0,0,0) 46%, rgba(0,0,0,.55) 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="12"
+         data-width="1080" data-height="1920">
+      <div id="bg" class="clip" data-start="0" data-duration="12" data-track-index="0"></div>
+
+      <div id="stage" class="clip" data-layout-allow-overlap data-layout-allow-occlusion
+           data-layout-allow-overflow data-start="0" data-duration="12" data-track-index="1">
+        <canvas id="tcanvas" width="1080" height="1920"></canvas>
+        <div id="orbglow"></div>
+        <div id="title" data-layout-allow-overlap data-layout-allow-occlusion>
+          <div class="line" id="l1" data-layout-allow-overlap data-layout-allow-occlusion></div>
+          <div class="line" id="l2" data-layout-allow-overlap data-layout-allow-occlusion></div>
+        </div>
+        <div id="sweep" data-layout-allow-overflow></div>
+        <div id="charge"></div>
+        <div id="flash" data-layout-allow-overflow></div>
+        <div id="plate"></div>
+        <img id="logo" src="./assets/img/logo.png" alt="" />
+        <canvas id="pcanvas" width="1080" height="1920"></canvas>
+        <div id="site" data-layout-allow-occlusion>estucasasv.com</div>
+      </div>
+
+      <div id="vignette" class="clip" data-layout-allow-occlusion data-start="0" data-duration="12" data-track-index="2"></div>
+    </div>
+
+    <script>
+      gsap.registerPlugin(MotionPathPlugin);
+      window.READY = false;
+      const DUR = 12;
+
+      /* ============ mulberry32 — sin Math.random en ninguna parte ============ */
+      function mulberry32(a) {
+        return function () {
+          a |= 0; a = (a + 0x6d2b79f5) | 0;
+          let t = Math.imul(a ^ (a >>> 15), 1 | a);
+          t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+      const SEED = 20260927;
+      const hash01 = (i, step) =>
+        mulberry32((SEED ^ Math.imul(i + 1, 2654435761) ^ Math.imul(step + 1, 40503)) | 0)();
+      const clamp01 = (v) => Math.max(0, Math.min(1, v));
+      const p2io = (v) => (v < .5 ? 2 * v * v : 1 - Math.pow(-2 * v + 2, 2) / 2);
+      const p3out = (v) => 1 - Math.pow(1 - v, 3);
+      const sio = (v) => -(Math.cos(Math.PI * v) - 1) / 2;
+      const smooth = (v) => { v = clamp01(v); return v * v * (3 - 2 * v); };
+      const backOut = gsap.parseEase("back.out(1.4)");
+      const ALFA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      const tl = gsap.timeline({ paused: true });
+
+      function makeLine(el, text, goldFrom) {
+        const out = [];
+        [...text].forEach((ch, i) => {
+          if (ch === " ") { const s = document.createElement("span"); s.className = "S"; el.appendChild(s); return; }
+          const L = document.createElement("span");
+          L.className = "L" + (i >= goldFrom ? " gold" : "");
+          L.setAttribute("data-layout-allow-overlap", ""); L.setAttribute("data-layout-allow-occlusion", "");
+          const g = document.createElement("span"); g.className = "g"; g.textContent = ch;
+          g.setAttribute("data-layout-allow-overlap", ""); g.setAttribute("data-layout-allow-occlusion", "");
+          L.appendChild(g);
+          const frags = [];
+          for (let k = 0; k < 4; k++) {
+            const f = document.createElement("span"); f.className = "frag"; f.textContent = ch;
+            f.setAttribute("data-layout-allow-overlap", ""); f.setAttribute("data-layout-allow-occlusion", "");
+            L.appendChild(f); frags.push({ el: f });
+          }
+          el.appendChild(L);
+          out.push({ L, g, frags, ch, idx: i });
+        });
+        return out;
+      }
+
+      async function build() {
+        await document.fonts.load('176px "Bebas Neue"');
+        await document.fonts.ready;
+        const logoImg = document.getElementById("logo");
+        try { await logoImg.decode(); } catch (e) {}
+
+        const L1 = makeLine(document.getElementById("l1"), "ES TU CASA", 6);
+        const L2 = makeLine(document.getElementById("l2"), "INMOBILIARIA", 99);
+        const ALL = L1.concat(L2);
+        // ancho fijo por letra: el scramble no hace bailar la línea
+        L1.forEach((o) => { o.L.style.width = o.g.offsetWidth + "px"; });
+        const rr = document.getElementById("root").getBoundingClientRect();
+        const rel = (el) => { const r = el.getBoundingClientRect();
+          return { x: r.left - rr.left, y: r.top - rr.top, w: r.width, h: r.height }; };
+        ALL.forEach((o) => { o.box = rel(o.L); o.gbox = rel(o.g); });
+
+        /* ================= ESCENA 1 — SCRAMBLE (0–2s) ================= */
+        tl.fromTo("#l1", { opacity: 0 }, { opacity: 1, duration: .3, ease: "power1.out" }, 0);
+        L1.forEach((o, j) => { o.lockStep = Math.round((.3 + (j / 7) * 1.2) * 15); o.shown = ""; });
+        function drawScramble(t) {
+          // 15 cambios/s alineados a frames de 30 fps: los dos subframes del motion blur
+          // siempre caen en el mismo glifo (sin letras fantasma)
+          const step = Math.ceil(t * 30 - 1e-4) >> 1;
+          L1.forEach((o) => {
+            const ch = step >= o.lockStep ? o.ch : ALFA[Math.floor(hash01(o.idx, step) * 26)];
+            if (ch !== o.shown) { o.g.textContent = ch; o.shown = ch; }
+          });
+        }
+
+        /* ================= ESCENA 2 — CURVA EN S + SLIDE 3D (2–4s) ================= */
+        const PATH = "M-620,560 C-250,600 -430,190 -130,205 C110,215 70,25 0,0";
+        const RAW = MotionPathPlugin.getRawPath(PATH);
+        MotionPathPlugin.cacheRawPathMeasurements(RAW);
+        const S2D = 1.0, pathEase = gsap.parseEase("power3.out");
+        gsap.set(L2.map((o) => o.L), { opacity: 0 });
+        L2.forEach((o, i) => {
+          o.t0 = 2.05 + i * .04;
+          tl.to(o.L, { opacity: 1, duration: .22, ease: "power1.out" }, o.t0);
+          tl.fromTo(o.L, { rotationX: -90 }, { rotationX: 0, duration: S2D, ease: "back.out(1.4)",
+            immediateRender: false }, o.t0);
+          tl.to(o.L, { motionPath: { path: PATH }, duration: S2D, ease: "power3.out" }, o.t0);
+        });
+        const tcv = document.getElementById("tcanvas"), tctx = tcv.getContext("2d");
+        function drawTrail(t) {
+          tctx.clearRect(0, 0, 1080, 1920);
+          if (t < 2.05 || t > 3.7) return;
+          tctx.font = '96px "Bebas Neue"'; tctx.textAlign = "center"; tctx.textBaseline = "middle";
+          tctx.fillStyle = "#f5a800";
+          L2.forEach((o) => {
+            for (let k = 1; k <= 8; k++) {
+              const tk = t - k * .028, u = (tk - o.t0) / S2D;
+              if (u <= 0 || u >= 1) continue;
+              const pos = MotionPathPlugin.getPositionOnPath(RAW, pathEase(u));
+              const rx = -90 + 90 * backOut(u);
+              const al = .30 * (1 - k / 9) * (1 - u) * clamp01((tk - o.t0) / .22);
+              if (al < .01) continue;
+              tctx.globalAlpha = al;
+              tctx.save();
+              tctx.translate(o.gbox.x + o.gbox.w / 2 + pos.x, o.gbox.y + o.gbox.h / 2 + pos.y);
+              tctx.scale(1, Math.max(.06, Math.abs(Math.cos(rx * Math.PI / 180))));
+              tctx.fillText(o.ch, 0, 0);
+              tctx.restore();
+            }
+          });
+          tctx.globalAlpha = 1;
+        }
+
+        /* ================= ESCENA 3 — GLOW + BARRIDO DE LUZ (4–6.5s) ================= */
+        const title = document.getElementById("title"), sweep = document.getElementById("sweep");
+        const TAN18 = Math.tan(18 * Math.PI / 180), PASSES = [4.35, 5.4], PASSD = .95;
+        ALL.forEach((o) => { o.cx = o.box.x + o.box.w / 2; o.cy = o.box.y + o.box.h / 2; });
+        let glowOn = false;
+        function drawGlow(t) {
+          if (t < 3.9 || t > 6.55) {
+            if (glowOn) {
+              ALL.forEach((o) => { o.L.style.textShadow = ""; o.L.style.filter = ""; });
+              title.style.filter = ""; sweep.style.opacity = 0; glowOn = false;
+            }
+            return;
+          }
+          glowOn = true;
+          const ramp = smooth((t - 3.9) / .4) * (1 - smooth((t - 6.2) / .3));
+          const k = (1 - Math.cos(2 * Math.PI * (t - 4) / 1.2)) / 2;
+          let bx = -9999, bo = 0;
+          PASSES.forEach((p0) => {
+            const u = (t - p0) / PASSD;
+            if (u < 0 || u > 1) return;
+            bx = -520 + 1700 * sio(u) + 210;
+            bo = Math.min(1, u / .1, (1 - u) / .12);
+          });
+          sweep.style.opacity = bo.toFixed(3);
+          sweep.style.transform = `translateX(${(bx - 210).toFixed(1)}px) rotate(18deg)`;
+          ALL.forEach((o) => {
+            const lineX = bx - (o.cy - 960) * TAN18;
+            const s = bo * Math.exp(-Math.pow((o.cx - lineX) / 110, 2));
+            let sh = `0 0 ${(12 + k * 26).toFixed(1)}px rgba(245,168,0,${((.3 + .45 * k) * ramp).toFixed(3)})`;
+            if (s > .01) sh += `, 0 0 22px rgba(255,255,255,${(.85 * s).toFixed(3)})`;
+            o.L.style.textShadow = sh;
+            o.L.style.filter = s > .01 ? `brightness(${(1 + .7 * s).toFixed(3)})` : "";
+          });
+          title.style.filter = `drop-shadow(0 0 ${(14 + k * 20).toFixed(1)}px rgba(245,168,0,${((.22 + .3 * k) * ramp).toFixed(3)}))`;
+        }
+
+        /* ================= ESCENA 4 — SPLIT Y SHATTER (6.5–8.5s) ================= */
+        const fr4 = mulberry32(SEED ^ 0x4f4);
+        ALL.forEach((o) => {
+          // 3 cortes inclinados → 4 trozos por letra
+          const cuts = [{ l: -20, r: -20 }];
+          for (let m = 1; m <= 3; m++) {
+            const base = m * 25 + (fr4() - .5) * 12, sl = (fr4() - .5) * 26;
+            cuts.push({ l: base - sl / 2, r: base + sl / 2 });
+          }
+          cuts.push({ l: 120, r: 120 });
+          o.cuts = cuts;
+          o.frags.forEach((f, k) => {
+            const a = cuts[k], b = cuts[k + 1];
+            f.el.style.clipPath = `polygon(-20% ${a.l}%,120% ${a.r}%,120% ${b.r}%,-20% ${b.l}%)`;
+            const yc = Math.max(0, Math.min(100, (a.l + a.r + b.l + b.r) / 4));
+            f.yc = yc;
+            f.x = (fr4() - .5) * 70; f.y = (k - 1.5) * 14 + (fr4() - .5) * 24;
+            f.rx = (fr4() - .5) * 60; f.ry = (fr4() - .5) * 40; f.rz = (fr4() - .5) * 16;
+            f.d = fr4() * .2;
+            gsap.set(f.el, { transformOrigin: `50% ${yc.toFixed(1)}%` });
+          });
+        });
+        const SPLIT = 6.55, FRAGD = 1.45;
+        tl.set(ALL.map((o) => o.g), { opacity: 0 }, SPLIT);
+        ALL.forEach((o) => o.frags.forEach((f) => {
+          tl.set(f.el, { opacity: 1 }, SPLIT);
+          tl.to(f.el, { x: f.x, y: f.y, rotationX: f.rx, rotationY: f.ry, rotation: f.rz,
+            opacity: .4, duration: FRAGD, ease: "power2.out" }, SPLIT + .05 + f.d);
+        }));
+        tl.to(ALL.flatMap((o) => o.frags.map((f) => f.el)), { opacity: 0, duration: .2, ease: "power1.in" }, 8.3);
+
+        /* ================= ESCENA 5 — PUNTOS → ORBE → CARGA → EXPLOSIÓN → LOGO ================= */
+        const ORB = { cx: 540, cy: 900, diam: 220, sample: 4, maxPts: 3000,
+                      breathe: .04, period: 1.6, spin: .7, wobble: .045,
+                      colors: ["#f5a800", "#00c9a7"] };
+        const PT_IN = 8.28, MIG0 = 8.45, MIGD = .75, MIGSPREAD = .25;
+        const BR0 = 9.2, CH0 = 9.9, EX0 = 10.1, EXD = .5, RC0 = 10.6, RCD = .42, RCSPREAD = .1;
+        const OUT0 = 11.24, OUTD = .24;
+        const R = ORB.diam / 2 / 1.12, TILT = -.38;
+        const g5 = mulberry32(SEED ^ 0x0b5);
+
+        function orbPoint(p, t, out) {
+          const a = p.ph + p.w * t, ca = Math.cos(a), sa = Math.sin(a);
+          const x = p.sx + ORB.wobble * (ca * p.e1x + sa * p.e2x);
+          const y = p.sy + ORB.wobble * (sa * p.e2y);
+          const z = p.sz + ORB.wobble * (ca * p.e1z + sa * p.e2z);
+          const ry = ORB.spin * (t - 9), cy = Math.cos(ry), sy = Math.sin(ry);
+          const x1 = x * cy + z * sy, z1 = -x * sy + z * cy;
+          const ct = Math.cos(TILT), st = Math.sin(TILT);
+          out.x = x1; out.y = y * ct - z1 * st; out.z = y * st + z1 * ct;
+          return out;
+        }
+        function orbScale(t) {
+          const bAmp = ORB.breathe * smooth((t - BR0) / .35);
+          let sc = 1 + bAmp * Math.sin(2 * Math.PI * (t - BR0) / ORB.period);
+          const c = clamp01((t - CH0) / (EX0 - CH0));
+          return sc * (1 - .15 * c * c);        // carga: contrae a 0.85, power2.in
+        }
+        const Q0 = {};
+        function orbScreen(p, t, o) {
+          orbPoint(p, t, Q0);
+          const ps = 4 / (4 - Q0.z), sc = orbScale(t), dz = (Q0.z + 1) / 2;
+          o.x = ORB.cx + Q0.x * R * ps * sc; o.y = ORB.cy - Q0.y * R * ps * sc;
+          o.al = .28 + .72 * dz; o.rs = (.7 + .45 * dz) * ps; o.z = Q0.z;
+          return o;
+        }
+
+        // 1) muestreo del texto (cada 4 px) → posición de salida = trozo desplazado
+        const oc = document.createElement("canvas"); oc.width = 1080; oc.height = 1920;
+        const g = oc.getContext("2d"); g.textBaseline = "top"; g.fillStyle = "#fff";
+        ALL.forEach((o) => {
+          g.font = (L1.includes(o) ? 176 : 96) + 'px "Bebas Neue"';
+          g.fillText(o.ch, o.gbox.x, o.gbox.y);
+        });
+        let d = g.getImageData(0, 0, 1080, 1920).data;
+        const raw = [];
+        for (let y = 0; y < 1920; y += ORB.sample)
+          for (let x = 0; x < 1080; x += ORB.sample)
+            if (d[(y * 1080 + x) * 4 + 3] > 40) raw.push([x, y]);
+        const stride = Math.max(1, raw.length / ORB.maxPts), src = [];
+        for (let i = 0; i < raw.length; i += stride) src.push(raw[Math.floor(i)]);
+        const N = src.length;
+        const starts = src.map(([x, y]) => {
+          const o = ALL.find((q) => x >= q.box.x - 2 && x <= q.box.x + q.box.w + 2 &&
+                                     y >= q.box.y - 2 && y <= q.box.y + q.box.h + 2);
+          if (!o) return { x, y };
+          const X = (x - o.box.x) / o.box.w * 100, Y = (y - o.box.y) / o.box.h * 100;
+          let k = 0;
+          for (let m = 1; m <= 3; m++) {
+            const c = o.cuts[m];
+            if (Y > c.l + (c.r - c.l) * (X + 20) / 140) k = m;
+          }
+          const f = o.frags[k];
+          const ox = o.box.x + o.box.w / 2, oy = o.box.y + o.box.h * f.yc / 100;
+          let vx = (x - ox) * Math.cos(f.ry * Math.PI / 180), vy = (y - oy) * Math.cos(f.rx * Math.PI / 180);
+          const a = f.rz * Math.PI / 180, ca = Math.cos(a), sa = Math.sin(a);
+          return { x: ox + vx * ca - vy * sa + f.x, y: oy + vx * sa + vy * ca + f.y };
+        });
+
+        // 2) esfera de Fibonacci
+        const GA = Math.PI * (3 - Math.sqrt(5)), tmp = {};
+        const sph = [];
+        for (let i = 0; i < N; i++) {
+          const sy = 1 - 2 * (i + .5) / N, r2 = Math.sqrt(1 - sy * sy), th = i * GA;
+          const sx = Math.cos(th) * r2, sz = Math.sin(th) * r2;
+          let e1x = sz, e1z = -sx; const n = Math.hypot(e1x, e1z) || 1; e1x /= n; e1z /= n;
+          sph.push({ sx, sy, sz, e1x, e1z, e2x: sy * e1z, e2y: sz * e1x - sx * e1z, e2z: -sy * e1x,
+                     c: ORB.colors[i % 2], ph: g5() * 6.283, w: (1.4 + g5() * 2.2) * (g5() < .5 ? -1 : 1) });
+        }
+        // izquierda del texto → izquierda del orbe
+        sph.forEach((p) => { p.key = orbPoint(p, MIG0 + MIGD, tmp).x; });
+        sph.sort((a, b) => a.key - b.key);
+        const ord = src.map((_, i) => i).sort((a, b) => starts[a].x - starts[b].x);
+        const PARTS = new Array(N);
+        ord.forEach((si, k) => {
+          const p = sph[k];
+          p.x = starts[si].x + (g5() - .5) * 1.6; p.y = starts[si].y + (g5() - .5) * 1.6;
+          p.r = .75 + g5() * .75;
+          p.d = (src[si][0] / 1080) * MIGSPREAD * .7 + g5() * MIGSPREAD * .3;
+          PARTS[si] = p;
+        });
+
+        // 3) explosión: origen = orbe en 10.1s, salida radial con velocidad propia
+        const o10 = {};
+        PARTS.forEach((p) => {
+          orbScreen(p, EX0, o10);
+          p.p0x = o10.x; p.p0y = o10.y; p.al0 = o10.al; p.rs0 = o10.rs;
+          const ang = Math.atan2(o10.y - ORB.cy, o10.x - ORB.cx) + (g5() - .5) * .5;
+          const dist = 150 + g5() * 260;
+          p.ux = Math.cos(ang); p.uy = Math.sin(ang);
+          p.ex = p.p0x + p.ux * dist; p.ey = p.p0y + p.uy * dist;
+          p.d2 = g5() * RCSPREAD;
+          p.bend = 40 + g5() * 90;
+        });
+
+        // 4) destino: silueta del logo muestreada igual que el texto
+        const LX = 290, LY = 620, LS = 500;
+        g.clearRect(0, 0, 1080, 1920);
+        g.drawImage(logoImg, LX, LY, LS, LS);
+        d = g.getImageData(0, 0, 1080, 1920).data;
+        const lraw = [];
+        for (let y = LY; y < LY + LS; y += ORB.sample)
+          for (let x = LX; x < LX + LS; x += ORB.sample)
+            if (d[(y * 1080 + x) * 4 + 3] > 200) lraw.push([x, y]);
+        const LCX = 540, LCY = LY + LS * .43;
+        const tg = [];
+        for (let i = 0; i < N; i++) tg.push(lraw[Math.floor(i * lraw.length / N)]);
+        tg.sort((a, b) => Math.atan2(a[1] - LCY, a[0] - LCX) - Math.atan2(b[1] - LCY, b[0] - LCX));
+        const byAng = PARTS.slice().sort((a, b) =>
+          Math.atan2(a.ey - ORB.cy, a.ex - ORB.cx) - Math.atan2(b.ey - ORB.cy, b.ex - ORB.cx));
+        byAng.forEach((p, i) => {
+          p.lx = tg[i][0]; p.ly = tg[i][1];
+          // curva: sigue un poco hacia afuera y gira hacia su destino a mitad de vuelo
+          p.qx = p.ex + p.ux * p.bend; p.qy = p.ey + p.uy * p.bend;
+        });
+        window.ORB_POINTS = N; window.LOGO_SAMPLES = lraw.length;
+
+        const cv = document.getElementById("pcanvas"), ctx = cv.getContext("2d");
+        const glow = document.getElementById("orbglow");
+        const P = {};
+        function drawParticles(t) {
+          ctx.clearRect(0, 0, 1080, 1920);
+          glow.style.opacity = 0;
+          if (t < PT_IN) return;
+          const fin = smooth((t - PT_IN) / .22);
+          const fout = 1 - smooth((t - OUT0) / OUTD);
+          if (fout <= 0) return;
+          const gform = smooth((t - 9.0) / .4) * (1 - smooth((t - EX0) / .15));
+          if (gform > 0) {
+            glow.style.opacity = (.8 * gform).toFixed(3);
+            glow.style.transform = `scale(${orbScale(t).toFixed(4)})`;
+          }
+          const pass = [[], []];
+          for (let i = 0; i < PARTS.length; i++) {
+            const p = PARTS[i]; let x, y, al, r;
+            if (t < EX0) {
+              orbScreen(p, t, P);
+              const e = p2io(clamp01((t - MIG0 - p.d) / MIGD));
+              const j = 1.2 * (1 - e);
+              x = p.x + (P.x - p.x) * e + Math.sin(t * 1.3 + p.ph) * j;
+              y = p.y + (P.y - p.y) * e + Math.cos(t * 1.1 + p.ph) * j;
+              al = fin * (1 + (P.al - 1) * e);
+              r = p.r * (1 + (P.rs * Math.max(orbScale(t), .55) - 1) * e);
+              pass[P.z > 0 ? 1 : 0].push(i, x, y, al, r);
+              continue;
+            }
+            if (t < RC0) {
+              const u = (t - EX0) / EXD, e = p3out(u);
+              x = p.p0x + (p.ex - p.p0x) * e; y = p.p0y + (p.ey - p.p0y) * e;
+              al = p.al0 + (1 - p.al0) * smooth(u * 2);
+              r = p.r * (p.rs0 + (1 - p.rs0) * u);
+            } else {
+              const u = sio(clamp01((t - RC0 - p.d2) / RCD)), v = 1 - u;
+              x = v * v * p.ex + 2 * u * v * p.qx + u * u * p.lx;
+              y = v * v * p.ey + 2 * u * v * p.qy + u * u * p.ly;
+              al = fout; r = p.r * (1 + .2 * u);
+            }
+            pass[1].push(i, x, y, al, r);
+          }
+          for (let s = 0; s < 2; s++) {
+            const a = pass[s];
+            for (let k = 0; k < a.length; k += 5) {
+              if (a[k + 3] <= .01) continue;
+              ctx.globalAlpha = a[k + 3]; ctx.fillStyle = PARTS[a[k]].c;
+              ctx.beginPath(); ctx.arc(a[k + 1], a[k + 2], a[k + 4], 0, 6.283); ctx.fill();
+            }
+          }
+          ctx.globalAlpha = 1;
+        }
+
+        // carga + destello (sin sacudida)
+        tl.fromTo("#charge", { opacity: 0, scale: .6 },
+          { opacity: .55, scale: .9, duration: .2, ease: "power2.in", immediateRender: false }, CH0);
+        tl.to("#charge", { opacity: 0, duration: .1, ease: "power1.out" }, EX0);
+        tl.fromTo("#flash", { opacity: 0, scale: .3 },
+          { opacity: .6, scale: .8, duration: .07, ease: "power2.out", immediateRender: false }, EX0);
+        tl.to("#flash", { opacity: 0, scale: 1.4, duration: .23, ease: "power2.out" }, EX0 + .07);
+
+        // logo nítido + URL
+        tl.fromTo("#site", { opacity: 0, y: 20 },
+          { opacity: 1, y: 0, duration: .4, ease: "power2.out", immediateRender: false }, 11.0);
+        tl.fromTo(["#plate", "#logo"], { opacity: 0 },
+          { opacity: 1, duration: .3, ease: "power1.inOut", immediateRender: false }, 11.2);
+
+        /* ================= reloj maestro: todo lo dibujado depende sólo de t ================= */
+        const M = { t: 0 };
+        tl.to(M, { t: DUR, duration: DUR, ease: "none", onUpdate: () => {
+          const t = M.t;
+          drawScramble(t); drawTrail(t); drawGlow(t); drawParticles(t);
+        }}, 0);
+
+        window.tl = tl;
+        window.__timelines["main"] = tl;
+        window.DURATION = () => DUR;
+        window.SEEK = (t) => tl.seek(Math.max(0, Math.min(t, DUR)), false);
+        window.SEEK(0);
+        window.READY = true;
+      }
+      build();
+    </script>
+  </body>
+</html>

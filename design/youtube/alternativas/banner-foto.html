@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>ES Tu Casa — Banner YouTube (fotos)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#F6F1E7; --ink:#141210;
+    --blue:#1B3A9C; --blue-deep:#0D2060; --night:#071440;
+    --torogoz:#2D8A3E; --sun:#F5A800; --sun-soft:#FFD060;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:2560px;height:1440px;overflow:hidden}
+  body{background:var(--night);font-family:'Figtree',sans-serif;-webkit-font-smoothing:antialiased;position:relative}
+
+  /* ---------- Foto de fondo ---------- */
+  .hero{position:absolute;inset:0}
+  .hero img{width:100%;height:100%;object-fit:cover;object-position:center 52%;
+    filter:brightness(1.12) saturate(1.14) contrast(1.04)}
+
+  /* Scrim: oscuro a la izquierda (donde va el texto), abierto a la derecha */
+  .scrim{position:absolute;inset:0;
+    background:linear-gradient(95deg,
+      rgba(7,20,64,.95) 0%, rgba(7,20,64,.88) 30%,
+      rgba(9,25,76,.66) 46%, rgba(13,32,96,.30) 62%,
+      rgba(13,32,96,.12) 78%, rgba(13,32,96,.06) 100%);}
+  /* Fundido vertical: fuera de la banda se va a azul noche (lo que ve la TV) */
+  .fade{position:absolute;inset:0;
+    background:linear-gradient(180deg,
+      var(--night) 0%, rgba(7,20,64,.88) 24%, rgba(7,20,64,.02) 35.5%,
+      rgba(7,20,64,.02) 64.5%, rgba(7,20,64,.88) 76%, var(--night) 100%);}
+  .warmth{position:absolute;right:0;top:0;width:1400px;height:1440px;
+    background:radial-gradient(circle at 75% 50%, rgba(245,168,0,.14) 0%, transparent 62%);}
+
+  /* Sombra suave solo detras del bloque de texto */
+  .textscrim{position:absolute;inset:0;
+    background:radial-gradient(ellipse 1560px 580px at 26% 50%,
+      rgba(7,20,64,.93) 0%, rgba(7,20,64,.80) 42%, rgba(7,20,64,.42) 66%, transparent 80%);}
+
+  /* ---------- Banda visible en desktop ---------- */
+  .band{position:absolute;left:0;right:0;top:508.5px;height:423px;
+    border-top:1px solid rgba(246,241,231,.14);
+    border-bottom:1px solid rgba(246,241,231,.14);}
+
+  /* ---------- Safe area 1546 x 423 ---------- */
+  .safe{position:absolute;left:50%;top:508.5px;transform:translateX(-50%);
+    width:1546px;height:423px;display:flex;align-items:center;gap:40px;padding:0 8px}
+
+  /* Placa crema para que el logo azul respire sobre el fondo oscuro */
+  .plate{flex:none;width:196px;height:196px;border-radius:26px;background:var(--cream);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 18px 44px rgba(0,0,0,.42), 0 0 0 1px rgba(246,241,231,.22);}
+  .plate img{width:166px;height:166px;object-fit:contain;margin-top:-6px}
+
+  .copy{flex:1 1 auto;min-width:0}
+  .eyebrow{display:flex;align-items:center;gap:13px;font-size:19px;font-weight:600;
+    letter-spacing:.24em;text-transform:uppercase;color:rgba(246,241,231,.82);margin-bottom:20px}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--sun);flex:none;
+       box-shadow:0 0 0 5px rgba(245,168,0,.22)}
+
+  h1{font-family:'Instrument Serif',serif;font-weight:400;font-size:100px;line-height:.98;
+     letter-spacing:-.02em;color:var(--cream);white-space:nowrap;
+     text-shadow:0 4px 26px rgba(0,0,0,.45)}
+  h1 em{font-style:italic;color:var(--sun-soft)}
+
+  .sub{margin-top:22px;font-size:26px;font-weight:400;color:rgba(246,241,231,.86);white-space:nowrap;
+       text-shadow:0 2px 14px rgba(0,0,0,.5)}
+  .sub b{font-weight:600;color:#fff}
+
+  .meta{margin-top:26px;display:flex;align-items:center;gap:16px}
+  .chip{display:inline-flex;align-items:center;gap:10px;padding:11px 18px;border-radius:999px;
+    border:1px solid rgba(246,241,231,.30);background:rgba(7,20,64,.42);
+    font-size:15px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--cream);white-space:nowrap}
+  .live{width:8px;height:8px;border-radius:50%;background:#49D16B;flex:none;box-shadow:0 0 0 4px rgba(73,209,107,.22)}
+  .site{font-size:20px;font-weight:700;color:var(--sun-soft);letter-spacing:.01em}
+
+  /* ---------- Tarjetas de propiedades ---------- */
+  .cards{flex:none;display:flex;align-items:center}
+  .card{width:190px;height:262px;border-radius:16px;overflow:hidden;position:relative;
+    box-shadow:0 20px 46px rgba(0,0,0,.52);border:2px solid rgba(246,241,231,.86);background:#123}
+  .card img{width:100%;height:100%;object-fit:cover;display:block}
+  .card::after{content:'';position:absolute;inset:0;
+    background:linear-gradient(180deg,transparent 52%,rgba(7,20,64,.55) 100%)}
+  .c1{transform:rotate(-4.5deg)}
+  .c2{margin-left:-22px;transform:rotate(1.5deg) translateY(-12px);z-index:2}
+  .c3{margin-left:-22px;transform:rotate(5.5deg) translateY(6px)}
+
+  /* ---------- Variantes ---------- */
+  /* A) Cinematografico: la foto manda, sin tarjetas */
+  body.v-cine .cards{display:none}
+  body.v-cine .scrim{background:linear-gradient(95deg,
+      rgba(7,20,64,.94) 0%, rgba(7,20,64,.86) 26%,
+      rgba(9,25,76,.60) 44%, rgba(13,32,96,.22) 62%,
+      rgba(13,32,96,.06) 80%, rgba(13,32,96,.02) 100%)}
+  body.v-cine .copy{flex:0 1 auto}
+
+  /* B) Mosaico: paneles rectos, fondo calmado */
+  body.v-mosaico .hero img{filter:brightness(.72) saturate(1.05) blur(3px)}
+  body.v-mosaico .scrim{background:linear-gradient(95deg,
+      rgba(7,20,64,.97) 0%, rgba(7,20,64,.95) 48%,
+      rgba(9,25,76,.88) 70%, rgba(13,32,96,.82) 100%)}
+  body.v-mosaico .c1,
+  body.v-mosaico .c2,
+  body.v-mosaico .c3{transform:none;margin-left:0;z-index:auto}
+  body.v-mosaico .cards{gap:14px}
+  body.v-mosaico .card{width:168px;height:252px;border-width:1px;
+      border-color:rgba(246,241,231,.45);border-radius:12px}
+
+  /* ---------- Guías ---------- */
+  .guides{display:none}
+  body.show-guides .guides{display:block}
+  .g-safe{position:absolute;left:50%;top:508.5px;transform:translateX(-50%);width:1546px;height:423px;border:3px dashed #FF5A5F}
+  .g-tablet{position:absolute;left:50%;top:508.5px;transform:translateX(-50%);width:1855px;height:423px;border:2px dashed #F5A800}
+  .g-desktop{position:absolute;left:0;top:508.5px;width:2560px;height:423px;border:2px dashed #6FC3FF}
+  .g-label{position:absolute;font:600 20px Figtree,sans-serif;padding:6px 12px;border-radius:6px;color:#fff}
+  .l1{background:#FF5A5F;left:50%;transform:translateX(-50%);top:466px}
+  .l2{background:#F5A800;left:calc(50% + 700px);top:946px;color:#141210}
+  .l3{background:#1B3A9C;left:24px;top:946px}
+</style>
+</head>
+<body>
+  <div class="hero"><img src="fotos/i-limpia.jpg" alt=""></div>
+  <div class="scrim"></div>
+  <div class="textscrim"></div>
+  <div class="warmth"></div>
+  <div class="fade"></div>
+  <div class="band"></div>
+
+  <div class="safe">
+    <div class="plate"><img src="logo.png" alt="ES Tu Casa Inmobiliaria"></div>
+
+    <div class="copy">
+      <div class="eyebrow"><span class="dot"></span>Bienes raíces · El Salvador</div>
+      <h1>El Salvador <em>es tu casa.</em></h1>
+      <div class="sub">Casas frente al mar, terrenos e inversión para el <b>Hermano Lejano</b></div>
+      <div class="meta">
+        <span class="chip"><span class="live"></span>Recorridos de propiedades</span>
+        <span class="site">estucasasv.com</span>
+      </div>
+    </div>
+
+    <div class="cards">
+      <div class="card c1"><img src="fotos/a-limpia.jpg" alt=""></div>
+      <div class="card c2"><img src="fotos/c-limpia.jpg" alt=""></div>
+      <div class="card c3"><img src="fotos/g-limpia.jpg" alt=""></div>
+    </div>
+  </div>
+
+  <div class="guides">
+    <div class="g-desktop"></div><div class="g-tablet"></div><div class="g-safe"></div>
+    <div class="g-label l1">SAFE AREA 1546 × 423</div>
+    <div class="g-label l2">TABLET 1855 × 423</div>
+    <div class="g-label l3">DESKTOP 2560 × 423</div>
+  </div>
+
+<script>
+  const q = new URLSearchParams(location.search);
+  if (q.get('guides') === '1') document.body.classList.add('show-guides');
+  const v = q.get('v');
+  if (v) document.body.classList.add('v-' + v);
+</script>
+</body>
+</html>

@@ -58,7 +58,7 @@ Sitio web profesional para [estucasasv.com](https://estucasasv.com), inmobiliari
 
 - **Mario Rivas** — WhatsApp 7988-9533 (+503 7988 9533)
 - **Carlos Díaz** — WhatsApp 7396-3858 (+503 7396 3858) — *bilingüe español-inglés*
-- **Email**: info@estucasasv.com
+- **Email**: estucasasv@gmail.com
 - **Redes**: Instagram, Facebook, TikTok, YouTube (@estucasa_elsalvador)
 
 ---

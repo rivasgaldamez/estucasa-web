@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>ES Tu Casa — Banner YouTube</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#F6F1E7; --cream-warm:#EFE8D9; --ink:#141210; --ink-soft:#3A322B;
+    --blue:#1B3A9C; --blue-deep:#0D2060; --torogoz:#2D8A3E; --turquoise:#3FB0C9;
+    --sun:#F5A800; --sun-soft:#FFD060; --stone:#E0D7C4;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:2560px;height:1440px;overflow:hidden}
+  body{
+    background:var(--cream);
+    font-family:'Figtree',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    position:relative;
+  }
+
+  /* ---------- Fondo full-bleed (solo TV ve los extremos) ---------- */
+  .bg{position:absolute;inset:0}
+  .glow-sun{
+    position:absolute; right:-300px; top:-380px; width:1500px; height:1500px;
+    background:radial-gradient(circle, rgba(245,168,0,.16) 0%, rgba(245,168,0,.05) 42%, transparent 68%);
+  }
+  .glow-blue{
+    position:absolute; left:-380px; bottom:-560px; width:1800px; height:1800px;
+    background:radial-gradient(circle, rgba(63,176,201,.055) 0%, rgba(63,176,201,.015) 44%, transparent 68%);
+  }
+  .warm{position:absolute;inset:0;
+    background:linear-gradient(115deg, var(--cream-warm) 0%, var(--cream) 38%, var(--cream) 64%, #FBF7EF 100%);}
+  .grain{
+    position:absolute; inset:0; opacity:.5;
+    background:
+      repeating-linear-gradient(90deg, rgba(20,18,16,.022) 0 1px, transparent 1px 160px);
+  }
+
+  /* ---------- Banda visible en desktop: 2560 x 423 centrada ---------- */
+  .band{
+    position:absolute; left:0; right:0; top:508.5px; height:423px;
+    border-top:1px solid rgba(20,18,16,.10);
+    border-bottom:1px solid rgba(20,18,16,.10);
+    background:linear-gradient(180deg, rgba(255,255,255,.34) 0%, rgba(255,255,255,0) 100%);
+  }
+  /* Marcas decorativas en los extremos de la banda (fuera del safe area) */
+  .band::before,.band::after{
+    content:''; position:absolute; top:50%; transform:translateY(-50%);
+    width:300px; height:1px;
+    background:linear-gradient(90deg, transparent, rgba(27,58,156,.22));
+  }
+  .band::before{left:96px}
+  .band::after{right:96px; background:linear-gradient(270deg, transparent, rgba(27,58,156,.22))}
+
+  /* ---------- Safe area: 1546 x 423 centrada ---------- */
+  .safe{
+    position:absolute; left:50%; top:508.5px; transform:translateX(-50%);
+    width:1546px; height:423px;
+    display:flex; align-items:center; gap:52px;
+    padding:0 16px;
+  }
+
+  .logo{width:218px;height:218px;object-fit:contain;flex:none;margin-top:-10px;
+        filter:drop-shadow(0 6px 18px rgba(13,32,96,.13))}
+
+  .rule{width:1px;height:212px;flex:none;
+    background:linear-gradient(180deg, transparent, rgba(20,18,16,.20) 18%, rgba(20,18,16,.20) 82%, transparent);}
+
+  .copy{flex:1 1 auto;min-width:0}
+
+  .eyebrow{
+    display:flex;align-items:center;gap:14px;
+    font-size:19px;font-weight:600;letter-spacing:.26em;text-transform:uppercase;
+    color:var(--ink-soft);margin-bottom:22px;
+  }
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--sun);flex:none;
+       box-shadow:0 0 0 5px rgba(245,168,0,.18)}
+
+  h1{
+    font-family:'Instrument Serif',serif;font-weight:400;
+    font-size:101px;line-height:.98;letter-spacing:-.022em;
+    color:var(--blue-deep);white-space:nowrap;
+  }
+  h1 em{font-style:italic;color:var(--blue)}
+
+  .sub{
+    margin-top:26px;font-size:27px;line-height:1.35;font-weight:400;
+    color:var(--ink-soft);white-space:nowrap;
+  }
+  .sub b{font-weight:600;color:var(--ink)}
+
+  /* ---------- Bloque derecho ---------- */
+  .aside{flex:none;width:262px;display:flex;flex-direction:column;align-items:flex-end;gap:18px;text-align:right}
+  .badge{
+    display:inline-flex;align-items:center;gap:11px;
+    padding:13px 20px;border:1px solid rgba(27,58,156,.26);border-radius:999px;
+    background:rgba(255,255,255,.62);
+    font-size:16px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--blue-deep);
+    white-space:nowrap;
+  }
+  .live{width:9px;height:9px;border-radius:50%;background:var(--torogoz);flex:none;
+        box-shadow:0 0 0 5px rgba(45,138,62,.16)}
+  .site{font-size:21px;font-weight:600;color:var(--blue);letter-spacing:.01em}
+  .tags{font-size:15px;font-weight:500;letter-spacing:.13em;text-transform:uppercase;color:rgba(58,50,43,.88);line-height:1.75}
+
+  /* ---------- Guías de seguridad (solo con ?guides=1) ---------- */
+  .guides{display:none}
+  body.show-guides .guides{display:block}
+  .g-safe{position:absolute;left:50%;top:508.5px;transform:translateX(-50%);
+    width:1546px;height:423px;border:3px dashed #E5484D;}
+  .g-tablet{position:absolute;left:50%;top:508.5px;transform:translateX(-50%);
+    width:1855px;height:423px;border:2px dashed #F5A800;}
+  .g-desktop{position:absolute;left:0;top:508.5px;width:2560px;height:423px;border:2px dashed #1B3A9C;}
+  .g-label{position:absolute;font:600 20px Figtree,sans-serif;padding:6px 12px;border-radius:6px;color:#fff}
+  .l1{background:#E5484D;left:50%;transform:translateX(-50%);top:466px}
+  .l2{background:#F5A800;left:calc(50% + 700px);top:946px}
+  .l3{background:#1B3A9C;left:24px;top:946px}
+</style>
+</head>
+<body>
+  <div class="bg">
+    <div class="warm"></div>
+    <div class="glow-sun"></div>
+    <div class="glow-blue"></div>
+    <div class="grain"></div>
+  </div>
+
+  <div class="band"></div>
+
+  <div class="safe">
+    <img class="logo" src="logo.png" alt="ES Tu Casa Inmobiliaria">
+    <div class="rule"></div>
+
+    <div class="copy">
+      <div class="eyebrow"><span class="dot"></span>Inmobiliaria · El Salvador</div>
+      <h1>El Salvador <em>es tu casa.</em></h1>
+      <div class="sub">Propiedades, guías y asesoría para el <b>Hermano Lejano</b></div>
+    </div>
+
+    <div class="aside">
+      <div class="badge"><span class="live"></span>Video cada semana</div>
+      <div class="site">estucasasv.com</div>
+      <div class="tags">Casas · Terrenos<br>Inversión · Trámites</div>
+    </div>
+  </div>
+
+  <div class="guides">
+    <div class="g-desktop"></div>
+    <div class="g-tablet"></div>
+    <div class="g-safe"></div>
+    <div class="g-label l1">SAFE AREA 1546 × 423 — visible en móvil, TV, desktop</div>
+    <div class="g-label l2">TABLET 1855 × 423</div>
+    <div class="g-label l3">DESKTOP 2560 × 423</div>
+  </div>
+
+<script>
+  if (new URLSearchParams(location.search).get('guides') === '1') {
+    document.body.classList.add('show-guides');
+  }
+</script>
+</body>
+</html>

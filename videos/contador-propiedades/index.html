@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "Bebas Neue";
+        src: url("./assets/fonts/BebasNeue-Regular.ttf") format("truetype");
+        font-weight: 400;
+        font-display: block;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body {
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #0d2060;
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background: #0d2060;
+        font-family: "Bebas Neue", sans-serif;
+      }
+      /* halo suave para que el dorado no flote sobre azul plano */
+      #glow {
+        position: absolute;
+        left: 50%; top: 46%;
+        width: 1500px; height: 1500px;
+        transform: translate(-50%, -50%);
+        background: radial-gradient(circle, rgba(220,178,91,0.16) 0%, rgba(220,178,91,0) 62%);
+      }
+      .stack {
+        position: absolute;
+        left: 0; right: 0;
+        text-align: center;
+      }
+      #counter {
+        top: 640px;
+        color: #dcb25b;
+        font-size: 440px;
+        line-height: 0.82;
+        letter-spacing: 0.01em;
+        font-variant-numeric: tabular-nums;
+      }
+      #label {
+        top: 1135px;
+        color: #dcb25b;
+        font-size: 96px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+      #rule {
+        position: absolute;
+        left: 50%; top: 1085px;
+        width: 260px; height: 4px;
+        margin-left: -130px;
+        background: #dcb25b;
+        transform-origin: 50% 50%;
+      }
+      /* El logo es navy #002060 sobre fondo navy #0D2060: invisible sin placa. */
+      #plate {
+        position: absolute;
+        left: 280px; top: 700px;
+        width: 520px; height: 520px;
+        border-radius: 44px;
+        background: #f7f2e8;
+        box-shadow: 0 0 0 3px rgba(220,178,91,0.85), 0 40px 90px rgba(0,0,0,0.35);
+      }
+      #logo {
+        position: absolute;
+        left: 370px; top: 790px;
+        width: 340px; height: 340px;
+        display: block;
+      }
+      #flash {
+        position: absolute;
+        inset: 0;
+        background: #fff7e3;
+        opacity: 0;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="5"
+      data-width="1080"
+      data-height="1920"
+    >
+      <div id="glow" class="clip" data-start="0" data-duration="5" data-track-index="0"></div>
+
+      <div id="counter" class="stack clip" data-layout-allow-occlusion data-start="0" data-duration="3.9" data-track-index="1">0</div>
+      <div id="rule" class="clip" data-start="0" data-duration="3.9" data-track-index="2"></div>
+      <div id="label" class="stack clip" data-layout-allow-occlusion data-start="0" data-duration="3.9" data-track-index="3">propiedades vendidas</div>
+
+      <div id="plate" class="clip" data-start="3.5" data-duration="1.5" data-track-index="4"></div>
+      <img id="logo" class="clip" src="./assets/img/logo.png" alt=""
+           data-start="3.5" data-duration="1.5" data-track-index="5" />
+
+      <div id="flash" class="clip" data-start="3.4" data-duration="0.8" data-track-index="6"></div>
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+
+      // --- estado inicial (determinista: nada depende del frame anterior) ---
+      gsap.set("#counter", { opacity: 0, scale: 0.92, transformOrigin: "50% 50%" });
+      gsap.set("#rule",    { opacity: 0, scaleX: 0 });
+      gsap.set("#label",   { opacity: 0, y: 28 });
+      gsap.set(["#plate", "#logo"], { opacity: 0, scale: 0.82, transformOrigin: "50% 50%" });
+      gsap.set("#flash",   { opacity: 0 });
+      gsap.set("#glow",    { opacity: 0 });
+
+      // --- 1. entrada ---
+      tl.to("#glow",    { opacity: 1, duration: 0.8, ease: "power1.out" }, 0);
+      tl.to("#counter", { opacity: 1, scale: 1, duration: 0.45, ease: "power2.out" }, 0.10);
+
+      // --- 2. el contador sube 0 -> 120 y frena ---
+      const n = { v: 0 };
+      const el = () => document.getElementById("counter");
+      tl.to(n, {
+        v: 120,
+        duration: 2.60,
+        ease: "power2.out",
+        onUpdate: () => { el().textContent = Math.round(n.v); }
+      }, 0.20);
+
+      // --- 3. regla + etiqueta ---
+      tl.to("#rule",  { opacity: 1, scaleX: 1, duration: 0.55, ease: "power2.out" }, 0.55);
+      tl.to("#label", { opacity: 1, y: 0, duration: 0.55, ease: "power1.out" }, 0.70);
+
+      // --- 4. salida del bloque de cifra ---
+      tl.to(["#counter", "#rule", "#label"],
+            { opacity: 0, y: -40, duration: 0.30, ease: "power2.in" }, 3.35);
+      tl.to("#glow", { opacity: 0.55, duration: 0.30 }, 3.35);
+
+      // --- 5. destello + logo ---
+      tl.to("#flash", { opacity: 0.92, duration: 0.10, ease: "power2.out" }, 3.46);
+      tl.to("#flash", { opacity: 0,    duration: 0.42, ease: "power2.in"  }, 3.56);
+      tl.to(["#plate", "#logo"], { opacity: 1, scale: 1, duration: 0.55, ease: "power2.out" }, 3.50);
+      tl.to(["#plate", "#logo"], { scale: 1.03, duration: 0.90, ease: "power1.out" }, 4.05);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

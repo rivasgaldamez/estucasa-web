@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/MotionPathPlugin.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "Bebas Neue";
+        src: url("./assets/fonts/BebasNeue-Regular.ttf") format("truetype");
+        font-weight: 400; font-display: block;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+      #root {
+        position: relative; width: 100%; height: 100%;
+        font-family: "Bebas Neue", sans-serif; background: #0d2060;
+      }
+      #bg {
+        position: absolute; inset: 0;
+        background: linear-gradient(180deg, #0d2060 0%, #0b1a4d 42%, #050a1e 78%, #000 100%);
+      }
+      #shake { position: absolute; inset: 0; }
+      .scene { position: absolute; inset: 0; opacity: 0; }
+
+      /* ---------- E1 glitch ---------- */
+      #black { position: absolute; inset: 0; background: #000; }
+      #scan {
+        position: absolute; inset: 0; opacity: .5;
+        background: repeating-linear-gradient(180deg,
+          rgba(255,255,255,.09) 0 2px, rgba(0,0,0,0) 2px 5px);
+      }
+      .g1 {
+        position: absolute; left: 0; right: 0; top: 830px; text-align: center;
+        font-size: 176px; letter-spacing: .035em; white-space: nowrap;
+      }
+      #g1r { color: #ff2d2d; mix-blend-mode: screen; }
+      #g1c { color: #00e5ff; mix-blend-mode: screen; }
+      #g1w { color: #fff; }
+
+      /* ---------- E2 zoom ---------- */
+      .zw {
+        position: absolute; left: 0; right: 0; top: 780px; text-align: center;
+        font-size: 210px; letter-spacing: .02em; color: #fff; opacity: 0; white-space: nowrap;
+      }
+      .zw.gold { color: #f5a800; }
+      #e2bg { position: absolute; inset: 0; opacity: 0; }
+
+      /* ---------- E3 ---------- */
+      #e3wrap { position: absolute; left: 0; right: 0; top: 760px; perspective: 800px; text-align: center; }
+      #inmo { display: block; white-space: nowrap; font-size: 124px; letter-spacing: .10em; }
+      #inmo .ltr { display: inline-block; color: #fff; transform-origin: 50% 100%; }
+      #tealline {
+        position: absolute; left: 50%; top: 940px; width: 620px; height: 7px;
+        margin-left: -310px; background: #00c9a7; transform-origin: 0% 50%; border-radius: 4px;
+      }
+      #hl-mask {
+        position: absolute; left: 0; right: 0; top: 990px; height: 120px; overflow: hidden;
+      }
+      #hl { text-align: center; font-size: 92px; letter-spacing: .16em; color: #00c9a7; }
+
+      /* ---------- E4 foto dentro del texto ---------- */
+      #e4wrap { position: absolute; left: 0; right: 0; top: 700px; text-align: center; }
+      #hogar {
+        display: inline-block; font-size: 300px; line-height: .96; letter-spacing: .01em;
+        background-image: url("./assets/propiedad.jpg");
+        background-size: 200% auto; background-position: 50% 50%;
+        -webkit-background-clip: text; background-clip: text;
+        -webkit-text-fill-color: transparent; color: transparent;
+        text-shadow: 0 0 0 rgba(255,255,255,0.01);
+      }
+      #e4glow {
+        position: absolute; left: 50%; top: 880px; width: 1000px; height: 620px;
+        margin-left: -500px; border-radius: 50%; opacity: 0;
+        background: radial-gradient(ellipse, rgba(245,168,0,.55) 0%, rgba(245,168,0,0) 68%);
+      }
+
+      /* ---------- E5 contador ---------- */
+      #e5wrap { position: absolute; left: 0; right: 0; top: 760px; text-align: center; }
+      #num {
+        position: relative; display: inline-block; font-size: 340px; line-height: 1;
+        letter-spacing: .01em; color: rgba(245,168,0,.26);
+        -webkit-text-stroke: 3px #f5a800;
+      }
+      #numfill {
+        position: absolute; left: 0; top: 0; color: #f5a800; -webkit-text-stroke: 0;
+        clip-path: inset(0 100% 0 0);
+      }
+      #plabel {
+        position: absolute; left: 0; right: 0; top: 1200px; text-align: center;
+        font-size: 84px; letter-spacing: .16em; color: #fff; opacity: 0;
+      }
+      #parts { position: absolute; inset: 0; overflow: hidden; }
+      .pt { position: absolute; border-radius: 50%; background: #f5a800; filter: blur(1.4px); }
+
+      /* ---------- E6 ---------- */
+      #e6wrap { position: absolute; left: 0; right: 0; top: 820px; text-align: center; perspective: 800px; }
+      #e6line { display: block; white-space: nowrap; font-size: 150px; letter-spacing: .05em; }
+      #e6line .ltr { position: relative; display: inline-block; color: #fff; }
+      #e6line .ltr.gold { color: #f5a800; }
+      #e6line .sp { width: .34em; }
+      .mv { display: inline-block; transform-origin: 50% 100%; }
+      .base { display: inline-block; }
+      .frag { position: absolute; left: 0; top: 0; display: inline-block; color: inherit; opacity: 0; }
+      #pcanvas { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+      #orbglow {
+        position: absolute; left: 280px; top: 640px; width: 520px; height: 520px;
+        border-radius: 50%; opacity: 0; pointer-events: none;
+        background: radial-gradient(circle, rgba(245,168,0,.30) 0%, rgba(0,201,167,.12) 38%, rgba(0,201,167,0) 68%);
+      }
+      #plate {
+        position: absolute; left: 315px; top: 640px; width: 450px; height: 450px;
+        border-radius: 42px; background: #f8f3e9;
+        box-shadow: 0 0 0 3px rgba(245,168,0,.9), 0 34px 84px rgba(0,0,0,.45);
+      }
+      #logo { position: absolute; left: 371px; top: 696px; width: 338px; height: 338px; }
+      #site {
+        position: absolute; left: 0; right: 0; top: 1150px; text-align: center;
+        font-size: 74px; letter-spacing: .14em; color: #f5a800; opacity: 0;
+      }
+
+      /* ---------- capas globales ---------- */
+      #grain {
+        position: absolute; inset: -60px; opacity: .10; pointer-events: none;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
+      }
+      #vignette {
+        position: absolute; inset: 0; pointer-events: none;
+        background: radial-gradient(ellipse 76% 58% at 50% 48%, rgba(0,0,0,0) 44%, rgba(0,0,0,.62) 100%);
+      }
+      #sweep {
+        position: absolute; top: -260px; left: 0; width: 420px; height: 2440px;
+        transform: rotate(18deg); mix-blend-mode: screen; opacity: 0; pointer-events: none;
+        background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.10) 34%,
+          rgba(255,248,224,.85) 50%, rgba(255,255,255,.10) 66%, rgba(255,255,255,0) 100%);
+      }
+      #wflash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="15"
+         data-width="1080" data-height="1920">
+      <div id="bg" class="clip" data-start="0" data-duration="15" data-track-index="0"></div>
+      <div id="e2bg" class="clip" data-start="2.5" data-duration="2.5" data-track-index="1"></div>
+
+      <div id="shake" class="clip" data-layout-allow-overlap data-layout-allow-occlusion
+           data-layout-allow-overflow data-start="0" data-duration="15" data-track-index="2">
+        <div id="orbglow"></div>
+        <canvas id="pcanvas" width="1080" height="1920"></canvas>
+
+        <div class="scene" id="s1">
+          <div id="black"></div><div id="scan"></div>
+          <div class="g1" id="g1r" data-layout-allow-overlap data-layout-allow-occlusion></div><div class="g1" id="g1c" data-layout-allow-overlap data-layout-allow-occlusion></div><div class="g1" id="g1w" data-layout-allow-overlap data-layout-allow-occlusion></div>
+        </div>
+
+        <div class="scene" id="s2">
+          <div class="zw" id="z0">TU</div><div class="zw gold" id="z1">CASA</div>
+          <div class="zw" id="z2">EN</div><div class="zw" id="z3">EL</div>
+          <div class="zw gold" id="z4">SALVADOR</div>
+        </div>
+
+        <div class="scene" id="s3">
+          <div id="e3wrap" data-layout-allow-occlusion><span id="inmo" data-layout-allow-occlusion></span></div>
+          <div id="tealline"></div>
+          <div id="hl-mask" data-layout-allow-occlusion><div id="hl" data-layout-allow-occlusion>HERMANO LEJANO</div></div>
+        </div>
+
+        <div class="scene" id="s4">
+          <div id="e4glow"></div>
+          <div id="e4wrap"><span id="hogar">TU HOGAR</span></div>
+        </div>
+
+        <div class="scene" id="s5">
+          <div id="parts"></div>
+          <div id="e5wrap"><span id="num" data-layout-allow-occlusion>+0<span id="numfill">+0</span></span></div>
+          <div id="plabel" data-layout-allow-occlusion>PROPIEDADES VENDIDAS</div>
+        </div>
+
+        <div class="scene" id="s6">
+          <div id="e6wrap"><span id="e6line"></span></div>
+        </div>
+      </div>
+
+      <div id="sweep" class="clip" data-layout-allow-overflow data-start="7.5" data-duration="2.5" data-track-index="3"></div>
+      <div id="plate" class="clip" data-start="14.0" data-duration="1" data-track-index="6"></div>
+      <img id="logo" class="clip" src="./assets/img/logo.png" alt="" data-start="14.0" data-duration="1" data-track-index="7" />
+      <div id="site" class="clip" data-start="14.0" data-duration="1" data-track-index="8">estucasasv.com</div>
+      <div id="wflash" class="clip" data-start="0" data-duration="15" data-track-index="10"></div>
+      <div id="grain" class="clip" data-layout-allow-overflow data-start="0" data-duration="15" data-track-index="11"></div>
+      <div id="vignette" class="clip" data-layout-allow-occlusion data-start="0" data-duration="15" data-track-index="12"></div>
+    </div>
+
+    <script>
+      gsap.registerPlugin(MotionPathPlugin);
+      window.READY = false;
+
+      /* ============ mulberry32 — sin Math.random en ninguna parte ============ */
+      function mulberry32(a) {
+        return function () {
+          a |= 0; a = (a + 0x6d2b79f5) | 0;
+          let t = Math.imul(a ^ (a >>> 15), 1 | a);
+          t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+      const SEED = 20260927;
+      const rnd = mulberry32(SEED);
+      function hash01(i, step) {
+        return mulberry32((SEED ^ Math.imul(i + 1, 2654435761) ^ Math.imul(step + 1, 40503)) | 0)();
+      }
+      const ALFA = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      const tl = gsap.timeline({ paused: true });
+
+      /* ================= ESCENA 1 — GLITCH + SCRAMBLE ================= */
+      const S1TXT = "ES TU CASA";
+      const g1 = ["#g1r", "#g1c", "#g1w"].map((s) => document.querySelector(s));
+      const s1 = { p: 0 };
+      tl.set("#s1", { opacity: 1 }, 0);
+      tl.to(s1, { p: 1, duration: 2.1, ease: "none", onUpdate: () => {
+        const t = s1.p * 2.1, step = Math.floor(t / (1 / 16));
+        let out = "";
+        for (let i = 0; i < S1TXT.length; i++) {
+          const ch = S1TXT[i];
+          if (ch === " ") { out += " "; continue; }
+          const lock = (i / (S1TXT.length - 1)) * 1.45;
+          out += (t >= lock) ? ch : ALFA[Math.floor(hash01(i, step) * 26)];
+        }
+        g1.forEach((e) => { e.textContent = out; });
+      }}, 0);
+      // aberración cromática + cortes horizontales, en instantes sembrados
+      const gl = { p: 0 };
+      tl.to(gl, { p: 1, duration: 2.35, ease: "none", onUpdate: () => {
+        const t = gl.p * 2.35, k = Math.floor(t * 12);
+        const hit = hash01(999, k) > 0.55;
+        const amp = hit ? 6 + hash01(777, k) * 26 : 2;
+        gsap.set("#g1r", { x: -amp, y: (hash01(11, k) - .5) * 6 });
+        gsap.set("#g1c", { x: amp, y: (hash01(22, k) - .5) * 6 });
+        if (hit) {
+          const a = hash01(33, k) * 70, b = a + 8 + hash01(44, k) * 18;
+          const cp = `polygon(0% 0%,100% 0%,100% ${a}%,0% ${a}%,0% ${b}%,100% ${b}%,100% 100%,0% 100%)`;
+          g1.forEach((e) => { e.style.clipPath = cp; });
+        } else g1.forEach((e) => { e.style.clipPath = "none"; });
+        gsap.set("#scan", { y: (t * 240) % 5 });
+      }}, 0);
+      tl.to("#wflash", { opacity: .95, duration: .07, ease: "power2.out" }, 2.36);
+      tl.to("#wflash", { opacity: 0, duration: .30, ease: "power2.in" }, 2.45);
+      tl.set("#s1", { opacity: 0 }, 2.5);
+
+      /* ================= ESCENA 2 — ZOOM CINÉTICO ================= */
+      tl.set("#s2", { opacity: 1 }, 2.5);
+      const ZW = ["#z0", "#z1", "#z2", "#z3", "#z4"];
+      ZW.slice(0, 4).forEach((sel, i) => {
+        const t0 = 2.5 + i * 0.4;
+        tl.fromTo(sel, { opacity: 0, scale: .35 },
+          { opacity: 1, scale: 1, duration: .16, ease: "power3.out", immediateRender: false }, t0);
+        tl.to(sel, { scale: 4.6, opacity: 0, duration: .30, ease: "power2.in" }, t0 + .16);
+        // fondo alterna Navy / Gold a cada golpe
+        tl.set("#e2bg", { opacity: 1, background: i % 2 ? "#f5a800" : "#0d2060" }, t0);
+        tl.to("#e2bg", { opacity: 0, duration: .34, ease: "power1.out" }, t0 + .06);
+      });
+      // SALVADOR llega por una curva en S y aterriza con rotación 3D
+      tl.fromTo("#z4", { opacity: 0 }, { opacity: 1, duration: .5, ease: "power2.out",
+        immediateRender: false,
+        motionPath: { path: [{ x: -900, y: 560 }, { x: 320, y: 240 },
+                             { x: -260, y: -60 }, { x: 0, y: 0 }],
+                      curviness: 1.5, autoRotate: false } }, 4.10);
+      tl.fromTo("#z4", { rotationX: -90, rotationZ: -18, scale: .7 },
+        { rotationX: 0, rotationZ: 0, scale: 1, duration: .72, ease: "back.out(1.5)",
+          immediateRender: false }, 4.10);
+      tl.to("#z4", { opacity: 0, scale: 1.3, duration: .22, ease: "power2.in" }, 4.86);
+      tl.set("#s2", { opacity: 0 }, 5.0);
+
+      /* ================= ESCENA 3 — SLIDE 3D + OLA + MÁSCARA ================= */
+      const inmo = document.getElementById("inmo");
+      const IL = [];
+      [..."INMOBILIARIA"].forEach((ch) => {
+        const s = document.createElement("span"); s.className = "ltr"; s.textContent = ch;
+        s.setAttribute("data-layout-allow-occlusion", "");
+        inmo.appendChild(s); IL.push(s);
+      });
+      // estado inicial explícito: con immediateRender:false estos elementos se verían
+      // desde el inicio de la escena, antes de su propia entrada
+      gsap.set("#hl", { opacity: 0, y: 120 });
+      gsap.set("#tealline", { scaleX: 0, opacity: 0 });
+      tl.set("#s3", { opacity: 1 }, 5.0);
+      tl.fromTo(IL, { opacity: 0, y: 90, rotationX: -90 },
+        { opacity: 1, y: 0, rotationX: 0, duration: .6, ease: "back.out(1.5)",
+          stagger: .04, immediateRender: false }, 5.0);
+      // ola
+      IL.forEach((el, i) => {
+        tl.to(el, { y: -34, duration: .22, ease: "sine.out" }, 5.95 + i * .045);
+        tl.to(el, { y: 0, duration: .30, ease: "sine.in" }, 6.17 + i * .045);
+      });
+      tl.fromTo("#tealline", { scaleX: 0, opacity: 0 },
+        { scaleX: 1, opacity: 1, duration: .8, ease: "power2.out", immediateRender: false }, 5.95);
+      // revelado con máscara: sube desde una línea invisible
+      tl.fromTo("#hl", { y: 120, opacity: 0 },
+        { y: 0, opacity: 1, duration: .55, ease: "power3.out", immediateRender: false }, 6.6);
+      tl.to("#s3", { opacity: 0, duration: .18 }, 7.42);
+
+      /* ================= ESCENA 4 — FOTO DENTRO DEL TEXTO ================= */
+      tl.set("#s4", { opacity: 1 }, 7.5);
+      tl.fromTo("#hogar", { opacity: 0, scale: .9 },
+        { opacity: 1, scale: 1, duration: .55, ease: "power3.out", immediateRender: false }, 7.5);
+      // parallax de la foto dentro de las letras
+      tl.fromTo("#hogar", { backgroundPosition: "36% 46%" },
+        { backgroundPosition: "64% 54%", duration: 2.3, ease: "none", immediateRender: false }, 7.6);
+      const e4 = { i: 0 };
+      tl.to(e4, { i: 1, duration: 2.2, ease: "none", onUpdate: () => {
+        const k = (1 - Math.cos(e4.i * Math.PI * 4)) / 2;
+        gsap.set("#e4glow", { opacity: .35 + k * .5 });
+        gsap.set("#hogar", { filter: `drop-shadow(0 0 ${8 + k * 26}px rgba(245,168,0,${.3 + k * .45}))` });
+      }}, 7.6);
+      gsap.set("#sweep", { x: -520, opacity: 0 });
+      [7.75, 8.85].forEach((t0) => {
+        tl.to("#sweep", { opacity: 1, duration: .1 }, t0);
+        tl.fromTo("#sweep", { x: -520 }, { x: 1180, duration: .9, ease: "power1.inOut" }, t0);
+        tl.to("#sweep", { opacity: 0, duration: .14 }, t0 + .82);
+      });
+      tl.to("#s4", { opacity: 0, duration: .18 }, 9.9);
+
+      /* ================= ESCENA 5 — CONTADOR + STROKE + WIPE ================= */
+      const host = document.getElementById("parts");
+      for (let i = 0; i < 30; i++) {
+        const d = document.createElement("div"); d.className = "pt";
+        const sz = 4 + rnd() * 11;
+        d.style.width = sz + "px"; d.style.height = sz + "px";
+        d.style.left = (rnd() * 1080).toFixed(1) + "px";
+        d.style.top = (600 + rnd() * 1100).toFixed(1) + "px";
+        host.appendChild(d);
+        const rise = 140 + rnd() * 240, dur = 3 + rnd() * 2, dl = rnd() * 1.2, pk = .18 + rnd() * .3;
+        gsap.set(d, { opacity: 0 });
+        tl.to(d, { y: -rise, duration: dur, ease: "none" }, 10 + dl);
+        tl.to(d, { opacity: pk, duration: dur * .35 }, 10 + dl);
+        tl.to(d, { opacity: 0, duration: dur * .4 }, 10 + dl + dur * .55);
+      }
+      tl.set("#s5", { opacity: 1 }, 10.0);
+      const num = document.getElementById("num"), nf = document.getElementById("numfill");
+      const cnt = { v: 0 };
+      tl.fromTo("#num", { opacity: 0, scale: .9 },
+        { opacity: 1, scale: 1, duration: .4, ease: "power3.out", immediateRender: false }, 10.0);
+      tl.to(cnt, { v: 120, duration: 1.5, ease: "power2.out", onUpdate: () => {
+        const s = "+" + Math.round(cnt.v);
+        num.firstChild.nodeValue = s; nf.textContent = s;
+      }}, 10.1);
+      // el contorno se rellena con un wipe de izquierda a derecha
+      tl.fromTo("#numfill", { clipPath: "inset(0 100% 0 0)" },
+        { clipPath: "inset(0 0% 0 0)", duration: .85, ease: "power2.inOut", immediateRender: false }, 11.25);
+      tl.fromTo("#plabel", { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: .5, ease: "power2.out", immediateRender: false }, 10.5);
+      tl.to("#s5", { opacity: 0, duration: .16 }, 12.44);
+
+      /* ================= ESCENA 6 — SHATTER SUAVE → ORBE DE PUNTOS → LOGO ================= */
+      // Receta del orbe: todo se calcula en función de t (seek-safe), nada se acumula.
+      const ORB = {
+        exit: "lift",        // "lift": se encoge y sube sobre el logo · "shrink": se encoge con fade
+        cx: 540, cy: 900,    // centro en pantalla
+        diam: 220,           // diámetro visible (tamaño "64" de Thinking Orbs)
+        sample: 4,           // muestreo del texto cada N px
+        maxPts: 3000,
+        breathe: .04,        // escala 0.96 ↔ 1.04
+        period: 1.6,         // ciclo de respiración (s)
+        spin: .7,            // giro del orbe (rad/s)
+        wobble: .045,        // radio de la órbita individual de cada punto (fracción del radio)
+        colors: ["#f5a800", "#00c9a7"],
+      };
+      const e6 = document.getElementById("e6line");
+      const E6 = [];
+      [..."ES TU CASA"].forEach((ch, i) => {
+        const s = document.createElement("span");
+        s.className = "ltr" + (ch === " " ? " sp" : "") + (i >= 6 ? " gold" : "");
+        if (ch === " ") { e6.appendChild(s); return; }
+        const mv = document.createElement("span"); mv.className = "mv";
+        const base = document.createElement("span"); base.className = "base"; base.textContent = ch;
+        mv.appendChild(base);
+        const fr = [];
+        for (let k = 0; k < 3; k++) {
+          const f = document.createElement("span"); f.className = "frag"; f.textContent = ch;
+          f.setAttribute("data-layout-allow-overlap", ""); f.setAttribute("data-layout-allow-occlusion", "");
+          const a = (k / 3) * 100, b = ((k + 1) / 3) * 100;
+          f.style.clipPath = `polygon(-20% ${a}%,120% ${a}%,120% ${b}%,-20% ${b}%)`;
+          mv.appendChild(f); fr.push(f);
+        }
+        s.appendChild(mv); e6.appendChild(s);
+        E6.push({ mv, base, frags: fr });
+      });
+      tl.set("#s6", { opacity: 1 }, 12.5);
+      tl.fromTo(E6.map((l) => l.mv), { opacity: 0, y: 26 },
+        { opacity: 1, y: 0, duration: .38, ease: "power2.out", stagger: .025,
+          immediateRender: false }, 12.5);
+
+      // el texto se disgrega: fragmentos que se separan poco y se apagan, sin rotación
+      const SPLIT = 12.92, PT_IN = 12.98, MIG0 = 13.0, MIGD = .72, MIGSPREAD = .22;
+      const fr6 = mulberry32(SEED ^ 0x6e6);
+      const shards = [];
+      E6.forEach((l) => l.frags.forEach((f, k) => shards.push({
+        f, x: (fr6() - .5) * 36, y: (k - 1) * 8 + (fr6() - .5) * 14, d: fr6() * .08,
+      })));
+      gsap.set(shards.map((s) => s.f), { opacity: 0 });
+      tl.set(E6.map((l) => l.base), { opacity: 0 }, SPLIT);
+      tl.set(shards.map((s) => s.f), { opacity: 1 }, SPLIT);
+      shards.forEach((s) => tl.to(s.f, { x: s.x, y: s.y, opacity: 0, duration: .45,
+        ease: "power1.out" }, SPLIT + .02 + s.d));
+      tl.set("#e6wrap", { opacity: 0 }, SPLIT + .6);
+
+      /* ---- orbe de puntos (canvas 2D, posición analítica en t) ---- */
+      const cv = document.getElementById("pcanvas"), ctx = cv.getContext("2d");
+      const glow = document.getElementById("orbglow");
+      const clamp01 = (v) => Math.max(0, Math.min(1, v));
+      const p2io = (v) => (v < .5 ? 2 * v * v : 1 - Math.pow(-2 * v + 2, 2) / 2);
+      const R = ORB.diam / 2 / 1.12;   // compensa la perspectiva del hemisferio frontal
+      const TILT = -.38;
+      let PARTS = null;
+      // posición de un punto de la esfera en t: órbita propia + giro + inclinación
+      function orbPoint(p, t, out) {
+        const a = p.ph + p.w * t, ca = Math.cos(a), sa = Math.sin(a);
+        const x = p.sx + ORB.wobble * (ca * p.e1x + sa * p.e2x);
+        const y = p.sy + ORB.wobble * (ca * p.e1y + sa * p.e2y);
+        const z = p.sz + ORB.wobble * (ca * p.e1z + sa * p.e2z);
+        const ry = ORB.spin * (t - 13), cy = Math.cos(ry), sy = Math.sin(ry);
+        const x1 = x * cy + z * sy, z1 = -x * sy + z * cy;
+        const ct = Math.cos(TILT), st = Math.sin(TILT);
+        out.x = x1; out.y = y * ct - z1 * st; out.z = y * st + z1 * ct;
+        return out;
+      }
+      function buildParticles() {
+        const g6 = mulberry32(SEED ^ 0x0b5);
+        const oc = document.createElement("canvas"); oc.width = 1080; oc.height = 1920;
+        const g = oc.getContext("2d");
+        g.textBaseline = "top"; g.fillStyle = "#fff";
+        const rr = document.getElementById("root").getBoundingClientRect();
+        const fs = getComputedStyle(document.getElementById("e6line")).fontSize;
+        E6.forEach((l) => {
+          const r = l.base.getBoundingClientRect();
+          g.font = fs + ' "Bebas Neue"';
+          g.fillText(l.base.textContent, r.left - rr.left, r.top - rr.top);
+        });
+        const d = g.getImageData(0, 0, 1080, 1920).data, raw = [];
+        for (let y = 0; y < 1920; y += ORB.sample)
+          for (let x = 0; x < 1080; x += ORB.sample)
+            if (d[(y * 1080 + x) * 4 + 3] > 40) raw.push([x, y]);
+        const stride = Math.max(1, raw.length / ORB.maxPts), src = [];
+        for (let i = 0; i < raw.length; i += stride) src.push(raw[Math.floor(i)]);
+        const N = src.length, GA = Math.PI * (3 - Math.sqrt(5)), tmp = {};
+        // esfera de Fibonacci
+        const sph = [];
+        for (let i = 0; i < N; i++) {
+          const sy = 1 - 2 * (i + .5) / N, rr2 = Math.sqrt(1 - sy * sy), th = i * GA;
+          const sx = Math.cos(th) * rr2, sz = Math.sin(th) * rr2;
+          // base tangente para la órbita individual
+          let e1x = sz, e1z = -sx;
+          const n = Math.hypot(e1x, e1z) || 1;
+          e1x /= n; e1z /= n;
+          const e2x = sy * e1z, e2y = sz * e1x - sx * e1z, e2z = -sy * e1x;
+          sph.push({ sx, sy, sz, e1x, e1y: 0, e1z, e2x, e2y, e2z, c: ORB.colors[i % 2],
+                     ph: g6() * 6.283, w: (1.4 + g6() * 2.2) * (g6() < .5 ? -1 : 1) });
+        }
+        // izquierda del texto → izquierda del orbe: la migración fluye, no se cruza
+        const tArr = MIG0 + MIGD + MIGSPREAD / 2;
+        sph.forEach((p) => { p.key = orbPoint(p, tArr, tmp).x; });
+        sph.sort((a, b) => a.key - b.key);
+        const ord = src.map((_, i) => i).sort((a, b) => src[a][0] - src[b][0]);
+        const out = new Array(N);
+        ord.forEach((si, k) => {
+          const [x, y] = src[si], p = sph[k];
+          p.x = x + (g6() - .5) * 1.6; p.y = y + (g6() - .5) * 1.6;
+          p.r = .75 + g6() * .75;                       // radio 0.75–1.5 → punto de 1.5–3 px
+          p.d = (x / 1080) * MIGSPREAD * .7 + g6() * MIGSPREAD * .3;
+          out[si] = p;
+        });
+        window.ORB_POINTS = N;
+        return out;
+      }
+      const ORB_EXIT0 = 13.9, ORB_EXITD = ORB.exit === "lift" ? .5 : .45;
+      const p3io = (v) => (v < .5 ? 4 * v * v * v : 1 - Math.pow(-2 * v + 2, 3) / 2);
+      const P = {};
+      function drawParticles(t) {
+        ctx.clearRect(0, 0, 1080, 1920);
+        glow.style.opacity = 0;
+        if (t < PT_IN) return;
+        if (!PARTS) PARTS = buildParticles();
+        const fin = p2io(clamp01((t - PT_IN) / .22));
+        const ex = p3io(clamp01((t - ORB_EXIT0) / ORB_EXITD));
+        let cx = ORB.cx, cy = ORB.cy, sc = 1, am = 1;
+        if (ORB.exit === "lift") { cy += (470 - ORB.cy) * ex; sc = 1 - .58 * ex; }
+        else { cy -= 40 * ex; sc = 1 - .65 * ex; am = 1 - ex; }
+        const bAmp = ORB.breathe * p2io(clamp01((t - 13.55) / .45));
+        sc *= 1 + bAmp * Math.sin((2 * Math.PI * (t - 13.55)) / ORB.period);
+        const form = p2io(clamp01((t - 13.45) / .55));
+        glow.style.opacity = (.8 * form * am).toFixed(3);
+        glow.style.transform = "translate(" + (cx - 540).toFixed(2) + "px," + (cy - 900).toFixed(2) +
+          "px) scale(" + sc.toFixed(4) + ")";
+        // dos pasadas: hemisferio trasero primero
+        for (let pass = 0; pass < 2; pass++) {
+          for (let i = 0; i < PARTS.length; i++) {
+            const p = PARTS[i];
+            orbPoint(p, t, P);
+            if ((P.z > 0) !== (pass === 1)) continue;
+            const e = p2io(clamp01((t - MIG0 - p.d) / MIGD));
+            const ps = 4 / (4 - P.z), dz = (P.z + 1) / 2;
+            const ox = cx + P.x * R * ps * sc, oy = cy - P.y * R * ps * sc;
+            const jx = Math.sin(t * 1.3 + p.ph) * 1.2 * (1 - e), jy = Math.cos(t * 1.1 + p.ph) * 1.2 * (1 - e);
+            const x = p.x + (ox - p.x) * e + jx, y = p.y + (oy - p.y) * e + jy;
+            const al = fin * am * (1 + ((.28 + .72 * dz) - 1) * e);
+            const r = p.r * (1 + ((.7 + .45 * dz) * ps * Math.max(sc, .55) - 1) * e);
+            if (al <= .01) continue;
+            ctx.globalAlpha = al; ctx.fillStyle = p.c;
+            ctx.beginPath(); ctx.arc(x, y, r, 0, 6.283); ctx.fill();
+          }
+        }
+        ctx.globalAlpha = 1;
+      }
+
+      /* ---- logo + URL: fade y slide suave ---- */
+      gsap.set(["#plate", "#logo", "#site"], { opacity: 0 });
+      tl.fromTo(["#plate", "#logo"], { opacity: 0, y: 36 },
+        { opacity: 1, y: 0, duration: .5, ease: "power2.out", immediateRender: false }, 14.18);
+      tl.fromTo("#site", { opacity: 0, y: 26 },
+        { opacity: 1, y: 0, duration: .45, ease: "power2.out", immediateRender: false }, 14.32);
+
+      /* ================= capa global: tick de sacudida por escena ================= */
+      [2.5, 5.0, 7.5, 10.0].forEach((t0, si) => {
+        for (let f = 0; f < 4; f++) {
+          tl.to("#shake", { x: (hash01(si * 7 + f, 5) - .5) * 30,
+                            y: (hash01(si * 7 + f, 9) - .5) * 24,
+                            duration: 1 / 30, ease: "none" }, t0 + f / 30);
+        }
+        tl.to("#shake", { x: 0, y: 0, duration: 1 / 30, ease: "none" }, t0 + 4 / 30);
+      });
+      // grano: desplazamiento a saltos, determinista
+      const gr = { p: 0 };
+      tl.to(gr, { p: 1, duration: 15, ease: "none", onUpdate: () => {
+        const k = Math.floor(gr.p * 15 * 12);
+        gsap.set("#grain", { backgroundPosition:
+          `${Math.floor(hash01(1, k) * 200)}px ${Math.floor(hash01(2, k) * 200)}px` });
+        drawParticles(gr.p * 15);
+      }}, 0);
+
+      /* ================= API ================= */
+      window.tl = tl;
+      window.__timelines["main"] = tl;
+      window.DURATION = () => 15;
+      window.SEEK = (t) => tl.seek(Math.max(0, Math.min(t, 15)), false);
+      window.SEEK(0);
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => { PARTS = null; window.READY = true; });
+      } else window.READY = true;
+    </script>
+  </body>
+</html>

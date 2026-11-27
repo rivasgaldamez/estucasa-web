@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>ES Tu Casa — Banner YouTube</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--cream:#F6F1E7;--night:#07132F;--blue:#1B3A9C;--sun:#F5A800;--sun-soft:#FFD060}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:2560px;height:1440px;overflow:hidden}
+  body{background:var(--night);font-family:'Figtree',sans-serif;-webkit-font-smoothing:antialiased;position:relative}
+
+  /* ---------- Campo de fondo ---------- */
+  .field{position:absolute;inset:0;
+    background:
+      radial-gradient(ellipse 820px 440px at 76% 50%, rgba(255,208,96,.17) 0%, rgba(255,208,96,.05) 48%, transparent 72%),
+      radial-gradient(ellipse 1500px 920px at 22% 48%, rgba(27,58,156,.40) 0%, transparent 66%),
+      radial-gradient(ellipse 900px 900px at 96% 50%, rgba(27,58,156,.30) 0%, transparent 70%),
+      linear-gradient(160deg, #0B1C4A 0%, var(--night) 50%, #06102C 100%);}
+  .plan{position:absolute;inset:0;opacity:.5;
+    background:
+      repeating-linear-gradient(90deg, rgba(246,241,231,.042) 0 1px, transparent 1px 128px),
+      repeating-linear-gradient(0deg, rgba(246,241,231,.042) 0 1px, transparent 1px 128px);}
+  .vfade{position:absolute;inset:0;background:linear-gradient(180deg,
+    var(--night) 0%, rgba(7,19,47,.64) 23%, transparent 35%,
+    transparent 65%, rgba(7,19,47,.64) 77%, var(--night) 100%)}
+
+  .band{position:absolute;left:0;right:0;top:508.5px;height:423px}
+  .band::before,.band::after{content:'';position:absolute;left:0;right:0;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(245,168,0,.30) 20%,rgba(245,168,0,.30) 80%,transparent)}
+  .band::before{top:0}.band::after{bottom:0}
+
+  /* ---------- Safe area 1546 x 423 ---------- */
+  .safe{position:absolute;left:50%;top:508.5px;transform:translateX(-50%);
+    width:1546px;height:423px;display:flex;align-items:center;gap:38px;padding:0 6px}
+
+  .plate{flex:none;width:170px;height:170px;border-radius:22px;background:var(--cream);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 16px 40px rgba(0,0,0,.52), 0 0 0 1px rgba(255,208,96,.28)}
+  .plate img{width:144px;height:144px;object-fit:contain;margin-top:-5px}
+
+  /* ---------- Bloque tipográfico ---------- */
+  .lock{flex:1 1 auto;min-width:0}
+  .kicker{display:flex;align-items:center;gap:15px;margin-bottom:11px}
+  .kicker b{font-size:20px;font-weight:700;letter-spacing:.3em;text-transform:uppercase;
+    color:var(--cream);white-space:nowrap}
+  .kicker i{flex:1 1 auto;height:1px;background:linear-gradient(90deg,var(--sun),rgba(245,168,0,0))}
+
+  /* El Pacífico dentro de las letras */
+  .big{font-family:'Instrument Serif',serif;font-size:178px;line-height:.86;letter-spacing:-.03em;
+    background-image:url('fotos/i-limpia.jpg');
+    background-size:2100px auto;background-position:center 15%;
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:brightness(1.34) saturate(1.34) contrast(1.07)
+           drop-shadow(0 10px 30px rgba(0,0,0,.45));
+    white-space:nowrap;display:inline-block}
+  .big em{font-style:italic}
+
+  .foot{margin-top:17px;display:flex;align-items:baseline;gap:20px}
+  .foot .t{font-size:23px;color:rgba(246,241,231,.86);white-space:nowrap}
+  .foot .t b{color:#fff;font-weight:600}
+  .foot .s{font-size:19px;font-weight:700;color:var(--sun-soft);white-space:nowrap}
+
+  /* ---------- Ventanas con propiedades ---------- */
+  .wins{flex:none;display:flex;align-items:flex-end;gap:19px;position:relative}
+  .wins::after{content:'';position:absolute;left:-38px;right:-38px;bottom:-28px;height:58px;
+    background:radial-gradient(ellipse 60% 100% at 50% 0%, rgba(245,168,0,.32), transparent 72%)}
+  .win{width:158px;height:268px;position:relative;overflow:hidden;
+    border-radius:79px 79px 10px 10px;
+    border:2px solid rgba(255,208,96,.58);
+    box-shadow:0 0 0 1px rgba(7,19,47,.6), 0 22px 50px rgba(0,0,0,.55), 0 0 46px rgba(245,168,0,.18)}
+  .win img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1.22) brightness(1.2)}
+  .win::after{content:'';position:absolute;inset:0;
+    background:linear-gradient(180deg, rgba(255,208,96,.10) 0%, transparent 34%, rgba(7,19,47,.40) 100%)}
+  .w1{height:246px}
+  .w2{height:296px}
+
+  .guides{display:none}body.show-guides .guides{display:block}
+  .g1{position:absolute;left:50%;top:508.5px;transform:translateX(-50%);width:1546px;height:423px;border:3px dashed #FF5A5F}
+  .g2{position:absolute;left:50%;top:508.5px;transform:translateX(-50%);width:1855px;height:423px;border:2px dashed #F5A800}
+  .g3{position:absolute;left:0;top:508.5px;width:2560px;height:423px;border:2px dashed #6FC3FF}
+</style>
+</head>
+<body>
+  <div class="field"></div><div class="plan"></div><div class="vfade"></div>
+  <div class="band"></div>
+
+  <div class="safe">
+    <div class="plate"><img src="logo.png" alt="ES Tu Casa Inmobiliaria"></div>
+
+    <div class="lock">
+      <div class="kicker"><b>El Salvador es</b><i></i></div>
+      <div class="big">TU <em>casa</em>.</div>
+      <div class="foot">
+        <div class="t">Casas frente al mar y terrenos para el <b>Hermano Lejano</b></div>
+        <div class="s">estucasasv.com</div>
+      </div>
+    </div>
+
+    <div class="wins">
+      <div class="win w1"><img src="fotos/g-limpia.jpg" alt=""></div>
+      <div class="win w2"><img src="fotos/c-limpia.jpg" alt=""></div>
+      <div class="win w3"><img src="fotos/b-limpia.jpg" alt=""></div>
+    </div>
+  </div>
+
+  <div class="guides"><div class="g3"></div><div class="g2"></div><div class="g1"></div></div>
+<script>if(new URLSearchParams(location.search).get('guides')==='1')document.body.classList.add('show-guides');</script>
+</body>
+</html>
