@@ -18,29 +18,14 @@ import {
   Mail,
   MessageCircle,
   X,
+  FileDown,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import WhatsAppLink from "@/components/WhatsAppLink";
 import { urlFor } from "@/lib/sanity";
 
 type Props = {
   propiedad: any;
-};
-
-const AMENIDADES: Record<string, string> = {
-  piscina: "Piscina privada",
-  jardin: "Jardín",
-  chimenea: "Chimenea",
-  ac: "Aire acondicionado central",
-  seguridad: "Seguridad 24/7",
-  "planta-electrica": "Planta eléctrica",
-  cisterna: "Cisterna",
-  cochera: "Cochera techada",
-  bbq: "Área BBQ",
-  vista: "Vista panorámica",
-  gimnasio: "Gimnasio",
-  salon: "Salón de usos múltiples",
 };
 
 export default function PropiedadDetalleClient({ propiedad }: Props) {
@@ -52,44 +37,31 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
   const tipo = propiedad?.tipo || "";
   const precio = Number(propiedad?.precio) || 0;
   const areaConstruccion = Number(propiedad?.areaConstruccion) || 0;
-  const estadoLabel =
-    propiedad?.estado === "vendida"
-      ? "Vendida"
-      : propiedad?.estado === "reservada"
-        ? "Reservada"
-        : null;
-  // Si el campo está vacío se asume varas cuadradas (como se mostraba antes)
-  const unidadTerreno = propiedad?.unidadTerreno === "m2" ? "m²" : "v²";
 
+  // Galería compatible con formato viejo (imagen directa) y nuevo (imagen + etiqueta)
   const processedGallery = useMemo(() => {
     const gallery = propiedad?.galeria || [];
-
     return gallery
       .map((item: any) => {
-        // Formato viejo: imagen directa
-        if (item?.asset) {
+        if (item && item.asset) {
           return { image: item, label: null };
         }
-
-        // Formato nuevo: objeto con imagen + etiqueta
-        if (item?.image?.asset) {
-          return {
-            image: item.image,
-            label: item.label || null,
-          };
+        if (item && item.image && item.image.asset) {
+          return { image: item.image, label: item.label || null };
         }
-
         return null;
       })
-      .filter(Boolean);
+      .filter((item: any) => item !== null);
   }, [propiedad?.galeria]);
 
   const allImages = useMemo(() => {
-    return [{ image: propiedad?.fotoPortada, label: null }, ...processedGallery].filter(
-      (item: any) => item?.image?.asset
-    );
+    return [
+      { image: propiedad?.fotoPortada, label: null },
+      ...processedGallery,
+    ].filter((item: any) => item.image && item.image.asset);
   }, [propiedad?.fotoPortada, processedGallery]);
 
+  // Fotos que tienen etiqueta (para los botones de áreas)
   const areasWithLabels = useMemo(() => {
     return allImages
       .map((item: any, index: number) => ({
@@ -114,6 +86,7 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
     return () => observer.disconnect();
   }, []);
 
+  // Bloquear scroll del body cuando el lightbox está abierto
   useEffect(() => {
     document.body.style.overflow = lightboxOpen ? "hidden" : "";
 
@@ -122,6 +95,7 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
     };
   }, [lightboxOpen]);
 
+  // Evita que activeImage quede fuera de rango si cambia la galería
   useEffect(() => {
     if (activeImage >= allImages.length) {
       setActiveImage(0);
@@ -129,7 +103,7 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
   }, [activeImage, allImages.length]);
 
   const getImageUrl = (image: any, width = 1600, height = 900) => {
-    if (!image?.asset) return "";
+    if (!image || !image.asset) return "";
 
     try {
       return urlFor(image).width(width).height(height).url();
@@ -163,13 +137,11 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
     `Hola, me interesa la propiedad ${codigo}: "${titulo}". Quisiera más información.`
   );
 
-  const telefonoAsesorRaw = propiedad?.asesor?.telefono || "50379889533";
-  const telefonoAsesor = String(telefonoAsesorRaw).replace(/\D/g, "");
-
+  const telefonoAsesor = propiedad?.asesor?.telefono || "50379889533";
   const nombreAsesor = propiedad?.asesor?.nombre || "Mario Rivas";
   const displayAsesor = propiedad?.asesor?.telefonoDisplay || "7988-9533";
   const cargoAsesor = propiedad?.asesor?.cargo || "Asesor Inmobiliario";
-  const emailAsesor = propiedad?.asesor?.email || "estucasasv@gmail.com";
+  const emailAsesor = propiedad?.asesor?.email || "info@estucasasv.com";
 
   const nextImage = () => {
     if (allImages.length === 0) return;
@@ -181,6 +153,7 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
     setActiveImage((prev) => (prev - 1 + allImages.length) % allImages.length);
   };
 
+  // Detecta si la descripción larga es Portable Text o texto simple
   const descripcionEsPortableText = Array.isArray(propiedad?.descripcionLarga);
 
   return (
@@ -211,12 +184,6 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
           <div className="grid md:grid-cols-[1fr_auto] gap-6 items-start mb-2">
             <div>
               <div className="flex items-center gap-3 mb-3 flex-wrap">
-                {estadoLabel ? (
-                  <span className="bg-ink text-cream px-3 py-1.5 rounded-full text-[11px] tracking-[0.18em] uppercase font-semibold">
-                    {estadoLabel}
-                  </span>
-                ) : null}
-
                 {propiedad?.etiqueta ? (
                   <span className="bg-sun text-brand-blue-deep px-3 py-1.5 rounded-full text-[11px] tracking-[0.18em] uppercase font-semibold">
                     {propiedad.etiqueta}
@@ -280,23 +247,7 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
             <div className="relative aspect-[16/9] rounded-3xl overflow-hidden bg-stone">
               <img
                 src={getImageUrl(allImages[activeImage].image, 1600, 900)}
-                srcSet={[640, 1024, 1600]
-                  .map(
-                    (w) =>
-                      `${getImageUrl(
-                        allImages[activeImage].image,
-                        w,
-                        Math.round((w * 9) / 16)
-                      )} ${w}w`
-                  )
-                  .join(", ")}
-                sizes="(min-width: 1536px) 1440px, 100vw"
                 alt={titulo}
-                width={1600}
-                height={900}
-                loading="eager"
-                fetchPriority="high"
-                decoding="async"
                 className="w-full h-full object-cover cursor-zoom-in"
                 onClick={() => setLightboxOpen(true)}
               />
@@ -353,10 +304,6 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
                     <img
                       src={getImageUrl(item.image, 200, 150)}
                       alt={`Vista ${index + 1}`}
-                      width={200}
-                      height={150}
-                      loading="lazy"
-                      decoding="async"
                       className="w-full h-full object-cover"
                     />
                   </button>
@@ -371,7 +318,6 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
                   <span>Explora los espacios</span>
                   <span className="text-base animate-bounce">👆</span>
                 </div>
-
                 <div className="flex flex-wrap gap-2">
                   {areasWithLabels.map((area: any) => (
                     <button
@@ -435,7 +381,7 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
                   <div className="display text-2xl">
                     {propiedad.areaTerreno}
                   </div>
-                  <div className="text-xs text-ink-soft">{unidadTerreno} terreno</div>
+                  <div className="text-xs text-ink-soft">v² terreno</div>
                 </div>
               ) : null}
 
@@ -453,7 +399,9 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
                   <div className="display text-2xl">
                     {propiedad.anoConstruccion}
                   </div>
-                  <div className="text-xs text-ink-soft">Año construcción</div>
+                  <div className="text-xs text-ink-soft">
+                    Año construcción
+                  </div>
                 </div>
               ) : null}
 
@@ -501,7 +449,7 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
                         className="flex items-center gap-2 text-sm py-2 px-4 bg-cream-warm rounded-full border border-black/5"
                       >
                         <span className="w-1.5 h-1.5 rounded-full bg-brand-blue" />
-                        <span>{AMENIDADES[amenidad] || amenidad}</span>
+                        <span>{amenidad}</span>
                       </div>
                     )
                   )}
@@ -516,7 +464,6 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
                   <iframe
                     src={getYoutubeEmbedUrl(propiedad.videoYoutube)}
                     title="Video tour"
-                    loading="lazy"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                     className="w-full h-full"
@@ -531,14 +478,10 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
               <div className="eyebrow text-sun mb-4">Asesor asignado</div>
 
               <div className="flex items-center gap-4 mb-6 pb-6 border-b border-black/10">
-                {propiedad?.asesor?.foto?.asset ? (
+                {propiedad?.asesor?.foto && propiedad.asesor.foto.asset ? (
                   <img
                     src={getImageUrl(propiedad.asesor.foto, 120, 120)}
                     alt={nombreAsesor}
-                    width={120}
-                    height={120}
-                    loading="lazy"
-                    decoding="async"
                     className="w-16 h-16 rounded-full object-cover"
                   />
                 ) : (
@@ -568,18 +511,30 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
               </div>
 
               <div className="space-y-3">
-                <WhatsAppLink
+                <a
                   href={`https://wa.me/${telefonoAsesor}?text=${whatsappMsg}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="w-full bg-brand-blue text-cream px-6 py-4 rounded-full text-sm font-medium inline-flex items-center justify-center gap-2 hover:bg-brand-blue-deep transition-colors"
                 >
                   <span>Escribir por WhatsApp</span>
                   <ArrowUpRight size={14} />
-                </WhatsAppLink>
+                </a>
 
-                <a href={`mailto:${emailAsesor}`}
+                <a
+                  href={`mailto:${emailAsesor}`}
                   className="w-full bg-transparent text-ink px-6 py-4 rounded-full text-sm font-medium inline-flex items-center justify-center gap-2 border border-black/10 hover:bg-ink hover:text-cream hover:border-ink transition-all"
                 >
                   <span>Enviar email</span>
+                </a>
+
+                <a
+                  href={`/api/ficha/${codigo}`}
+                  download
+                  className="w-full bg-sun text-brand-blue-deep px-6 py-4 rounded-full text-sm font-semibold inline-flex items-center justify-center gap-2 hover:bg-sun-soft transition-colors"
+                >
+                  <FileDown size={16} />
+                  <span>Descargar ficha PDF</span>
                 </a>
               </div>
 
@@ -609,15 +564,17 @@ export default function PropiedadDetalleClient({ propiedad }: Props) {
               prefieras. Atención personalizada sin presión comercial.
             </p>
 
-            <WhatsAppLink
+            <a
               href={`https://wa.me/${telefonoAsesor}?text=${whatsappMsg}`}
+              target="_blank"
+              rel="noopener noreferrer"
               className="bg-sun text-brand-blue-deep px-7 py-4 rounded-full text-sm font-semibold inline-flex items-center gap-2 hover:bg-sun-soft transition-colors"
             >
               <span>
                 WhatsApp {nombreAsesor.split(" ")[0]} - {displayAsesor}
               </span>
               <ArrowUpRight size={14} />
-            </WhatsAppLink>
+            </a>
           </div>
         </div>
       </section>
